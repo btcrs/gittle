@@ -55,17 +55,17 @@ def info_refs(project_name):
 
 @app.route('/<string:project_name>/git-receive-pack', methods=('POST',))
 def git_receive_pack(project_name):
-    p = subprocess.Popen(['git-receive-pack', '--stateless-rpc', 'test'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    p.stdin.write(binascii.b2a_qp(request.data))
-    print(binascii.b2a_qp(request.data))
-    data = p.stdout.read()
-    res = make_response()
-    res.headers['Expires'] = 'Fri, 01 Jan 1980 00:00:00 GMT'
-    res.headers['Pragma'] = 'no-cache'
-    res.headers['Cache-Control'] = 'no-cache, max-age=0, must-revalidate'
-    res.headers['Content-Type'] = 'application/x-git-receive-pack-result'
-    p.wait()
-    return 'res'
+    # p = subprocess.Popen(['git-receive-pack', '--stateless-rpc', 'test'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    # p.stdin.write(binascii.b2a_qp(request.data))
+    # print(binascii.b2a_qp(request.data))
+    # data = p.stdout.read()
+    res = make_response('r')
+    # res.headers['Expires'] = 'Fri, 01 Jan 1980 00:00:00 GMT'
+    # res.headers['Pragma'] = 'no-cache'
+    # res.headers['Cache-Control'] = 'no-cache, max-age=0, must-revalidate'
+    # res.headers['Content-Type'] = 'application/x-git-receive-pack-result'
+    # p.wait()
+    return res
 
 @app.route('/<string:project_name>/git-upload-pack', methods=('POST',))
 def git_upload_pack(project_name):
