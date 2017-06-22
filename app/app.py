@@ -54,7 +54,7 @@ def info_refs(project_name):
     service = request.args.get('service')
     if service[:4] != 'git-':
         abort(500)
-    p = subprocess.Popen([service, '--stateless-rpc', '--advertise-refs', 'test'], stdout=subprocess.PIPE)
+    p = subprocess.Popen([service, '--stateless-rpc', '--advertise-refs', os.path.join('.', project_name)], stdout=subprocess.PIPE)
     packet = '# service=%s\n' % service
     length = len(packet) + 4
     prefix = "{:04x}".format(length & 0xFFFF);
@@ -70,7 +70,7 @@ def info_refs(project_name):
 
 @app.route('/<string:project_name>/git-receive-pack', methods=('POST',))
 def git_receive_pack(project_name):
-    p = subprocess.Popen(['git-receive-pack', '--stateless-rpc', 'test'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git-receive-pack', '--stateless-rpc', os.path.join('.', project_name)], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     data = p.communicate(input=request.data)[0]
     res = make_response(data)
     res.headers['Expires'] = 'Fri, 01 Jan 1980 00:00:00 GMT'
