@@ -6,9 +6,9 @@ import sys
 import pygit2
 import binascii
 
-# @app.route("/")
-# def hello():
-#     return "Hello World!"
+@app.route("/")
+def hello():
+    return "Hello World!"
 
 # @app.route("/create")
 # def create():
@@ -37,12 +37,7 @@ def info_refs(project_name):
     p = subprocess.Popen([service, '--stateless-rpc', '--advertise-refs', 'test'], stdout=subprocess.PIPE)
     packet = '# service=%s\n' % service
     length = len(packet) + 4
-    _hex = '0123456789abcdef'
-    prefix = ''
-    prefix += _hex[length >> 12 & 0xf]
-    prefix += _hex[length >> 8  & 0xf]
-    prefix += _hex[length >> 4 & 0xf]
-    prefix += _hex[length & 0xf]
+    prefix = "{:04x}".format(length & 0xFFFF);
     data = str.encode(prefix) + str.encode(packet) + b'0000'
     data += p.stdout.read()
     res = make_response(data)
