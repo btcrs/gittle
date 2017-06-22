@@ -2,7 +2,6 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
     url(r'^create/(?P<user>\w+)/(?P<project_name>\w+)$', views.create, name='create'),
     url(r'^user/(?P<project_name>\w+)/(?P<oid>\w+)$', views.show_file, name='show-file'),
     url(r'^user/(?P<project_name>\w+)$', views.list_files, name='list-files'),

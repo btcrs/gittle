@@ -1,3 +1,4 @@
-repos
+app/repos/*
+**/.DS_Store
 /test
 __pycache__
