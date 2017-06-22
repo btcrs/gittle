@@ -10,10 +10,10 @@ import binascii
 def hello():
     return render_template("index.html")
 
-# @app.route("/create")
-# def create():
-#     pygit2.init_repository('repos/git/test', True)
-#     return "Create!"
+@app.route("/create/<string:user>/<string:project_name>")
+def create():
+    pygit2.init_repository(project_name, True)
+    return "Create!"
 
 # @app.route("/clone/info/<path:path>")
 # def clone(path):
