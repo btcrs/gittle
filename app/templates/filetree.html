@@ -1,9 +1,0 @@
-<h1>File Tree</h1>
-{% for key in file_list recursive %}
-    {% if file_list[key] is iterable %}
-        <div style="margin-left: {{loop.depth0 * 10}}px">- {{ key }}</div>
-        {{ loop(file_list[key]) }}
-    {% else %}
-        <div>- {{ key }}<div>
-    {% endif %}
-{% endfor %}
