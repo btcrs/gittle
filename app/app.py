@@ -11,7 +11,7 @@ def hello():
     return render_template("index.html")
 
 @app.route("/create/<string:user>/<string:project_name>")
-def create():
+def create(user, project_name):
     pygit2.init_repository(project_name, True)
     return "Create!"
 
