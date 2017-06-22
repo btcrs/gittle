@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request, abort
+from flask import Flask, make_response, request, abort, jsonify, render_template
 import subprocess, os.path
 app = Flask(__name__)
 
@@ -6,9 +6,9 @@ import sys
 import pygit2
 import binascii
 
-# @app.route("/")
-# def hello():
-#     return "Hello World!"
+@app.route("/")
+def hello():
+    return render_template("index.html")
 
 # @app.route("/create")
 # def create():
@@ -28,6 +28,26 @@ import binascii
 #     ) = gitHttpBackend.wsgi_to_git_http_backend(environ, 'repos/git/test')
 #     return Response(response_body_generator, status_line, headers)
     # return send_from_directory('repos/git/test/', path)
+
+def parse_file_tree(repo, tree):
+    temp_dict = {}
+    for e in tree:
+        print('name: {}, type:  {}'.format(e.name, e.type))
+        if e.type == 'tree':
+            temp_dict[e.name] = parse_file_tree(repo, repo.get(e.id))
+        else:
+            temp_dict[e.name] = e.id
+    return temp_dict
+
+@app.route("/user/<string:project_name>")
+def list_files(project_name):
+    repo = pygit2.Repository(project_name)
+    tree = repo.revparse_single('master').tree
+    tree_dict = {}
+    tree_dict = parse_file_tree(repo, tree)
+    # file_list = [e for e in tree]
+    return render_template("filetree.html", file_list=tree_dict)
+    # return jsonify(file_list)
 
 @app.route('/<string:project_name>/info/refs')
 def info_refs(project_name):
