@@ -86,8 +86,8 @@ def list_repos(request, user):
     """
 
     path = os.path.join("./repos", user)
-    directories = [name for name in os.listdir(path)
-    return JsonResponse('data': directories)
+    directories = [name for name in os.listdir(path)]
+    return JsonResponse({'data': directories})
 
 def info_refs(request, user, project_name):
     """ Initiates a handshake for a smart HTTP connection
