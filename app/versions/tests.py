@@ -1,21 +1,27 @@
+from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from django.test import TestCase
-from pygit2 import repository
+from time import time
+import shutil
 import os
 
 class VersionsViewsTestCase(TestCase):
+
+    def tearDownClass():
+        path = os.path.join("./repos", 'testuser', 'testapp')
+        shutil.rmtree(path)
+
     def test_create(self):
         response = self.client.get('/create/testuser/testapp')
-        print(response)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Created at ./repos/testuser/testapp' in response.context)
+        self.assertTrue(b'Created at ./repos/testuser/testapp' in response.content)
 
     def test_created_bare(self):
-        path = os.path.join("./repos", testuser, testapp, '.git')
+        path = os.path.join("./repos", 'testuser', 'testapp')
         repo = Repository(path)
         self.assertTrue(repo.is_bare)
 
     def test_list_files(self):
-        path = os.path.join("./repos", testuser, testapp, '.git')
+        path = os.path.join("./repos", 'testuser', 'testapp')
         repo = Repository(path)
         one = repo.create_blob('test file')
         two = repo.create_blob('test file 2')
@@ -33,3 +39,6 @@ class VersionsViewsTestCase(TestCase):
         commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', precommit, [])
         response = self.client.get('/testuser/testapp')
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(b'testfile1.txt' in response.content)
+        self.assertTrue(b'testfile2.txt' in response.content)
+        self.assertTrue(b'tree2' in response.content)
