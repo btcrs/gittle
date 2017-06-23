@@ -1,3 +1,4 @@
+from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from django.http import HttpResponse, JsonResponse
 from .git import GitResponse
 from enum import Enum
@@ -36,7 +37,13 @@ def create(request, user, project_name):
     """
 
     path = os.path.join("./repos", user, project_name)
-    pygit2.init_repository(path, True)
+    repo = pygit2.init_repository(path, True)
+    readme = repo.create_blob('#Hello, World!')
+    master = repo.TreeBuilder()
+    master.insert('readme.md', readme, GIT_FILEMODE_BLOB)
+    precommit = master.write()
+    signature = Signature(user, '{}@example.com'.format(user), int(time()), 0)
+    commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', precommit, [])
     return HttpResponse("Created at {}".format(path))
 
 def show_file(request, user, project_name, oid):
