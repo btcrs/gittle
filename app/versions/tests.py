@@ -10,17 +10,7 @@ class VersionsViewsTestCase(TestCase):
         path = os.path.join("./repos", 'testuser', 'testapp')
         shutil.rmtree(path)
 
-    def test_create(self):
-        response = self.client.get('/create/testuser/testapp')
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(b'Created at ./repos/testuser/testapp' in response.content)
-
-    def test_created_bare(self):
-        path = os.path.join("./repos", 'testuser', 'testapp')
-        repo = Repository(path)
-        self.assertTrue(repo.is_bare)
-
-    def test_list_files(self):
+    def create_directory_structure(self):
         path = os.path.join("./repos", 'testuser', 'testapp')
         repo = Repository(path)
         one = repo.create_blob('test file')
@@ -37,6 +27,18 @@ class VersionsViewsTestCase(TestCase):
         precommit = tree1.write()
         signature = Signature('Tester', 'test@example.com', int(time()), 0)
         commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', precommit, [])
+
+    def test_create(self):
+        response = self.client.get('/create/testuser/testapp')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(b'Created at ./repos/testuser/testapp' in response.content)
+
+    def test_created_bare(self):
+        path = os.path.join("./repos", 'testuser', 'testapp')
+        repo = Repository(path)
+        self.assertTrue(repo.is_bare)
+
+    def test_list_files(self):
         response = self.client.get('/testuser/testapp')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'testfile1.txt' in response.content)

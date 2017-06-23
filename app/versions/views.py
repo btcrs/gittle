@@ -4,6 +4,7 @@ from enum import Enum
 import os.path
 import pygit2
 import json
+import os
 
 class Actions(Enum):
     advertisement = 'advertisement'
@@ -73,6 +74,20 @@ def list_files(request, user, project_name):
     repo = pygit2.Repository(os.path.join("./repos", user, project_name))
     tree = repo.revparse_single('master').tree
     return JsonResponse(parse_file_tree(tree))
+
+def list_repos(request, user):
+    """ Grabs and returns all of a user's repository
+
+    Args:
+        user (string): The user's name.
+
+    Returns:
+        JsonResponse: An object with the requested user's repositories
+    """
+
+    path = os.path.join("./repos", user)
+    directories = [name for name in os.listdir(path)
+    return JsonResponse('data': directories)
 
 def info_refs(request, user, project_name):
     """ Initiates a handshake for a smart HTTP connection
