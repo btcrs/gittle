@@ -103,3 +103,60 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue'
+        }
+    },
+    'formatters': {
+        'main_formatter': {
+        'format': '%(levelname)s:%(name)s: %(message)s '
+        '(%(asctime)s; %(filename)s:%(lineno)d)',
+        'datefmt': "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'main_formatter',
+        },
+        'debug_file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'logs/main_debug.log',
+            'maxBytes': 1024 * 1024 * 5,
+            'backupCount': 7,
+            'formatter': 'main_formatter',
+            'filters': ['require_debug_true'],
+        }
+        'null': {
+            "class": 'django.utils.log.NullHandler',
+        }
+    },
+    'loggers': {
+        'django.request': {
+        'handlers': ['mail_admins', 'console'],
+        'level': 'ERROR',
+        'propagate': True,
+        },
+        'django': {
+            'handlers': ['null', ],
+        },
+        'py.warnings': {
+            'handlers': ['null', ],
+        },
+        '': {
+        'handlers': ['console', 'debug_file'],
+            'level': "DEBUG",
+        },
+    }
+}

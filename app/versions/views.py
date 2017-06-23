@@ -2,10 +2,14 @@ from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from django.http import HttpResponse, JsonResponse
 from .git import GitResponse
 from enum import Enum
+import logging
 import os.path
 import pygit2
+import shutil
 import json
 import os
+
+logger = logging.getLogger(__name__)
 
 class Actions(Enum):
     advertisement = 'advertisement'
@@ -23,6 +27,7 @@ def parse_file_tree(tree):
         dict: A list of all files in the top level of the provided tree.
     """
 
+    logging.debug("Given tree is type {}".format(type(tree)))
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
 def create(request, user, project_name):
@@ -45,6 +50,21 @@ def create(request, user, project_name):
     signature = Signature(user, '{}@example.com'.format(user), int(time()), 0)
     commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', precommit, [])
     return HttpResponse("Created at {}".format(path))
+
+def delete(request, user, project_name):
+    """ Deletes the repository with the provided name
+
+    Args:
+        user (string): The user's name.
+        project_name (string): The user's repository name.
+
+    Returns:
+        HttpResponse: A message indicating the success or failure of the delete
+    """
+
+    path = os.path.join("./repos", user, project_name)
+    shutil.rmtree(path)
+    return HttpResponse("Delted {}".format(path))
 
 def show_file(request, user, project_name, oid):
     """ Grabs and returns a single file from a user's repository

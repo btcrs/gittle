@@ -2,7 +2,10 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.http import HttpResponse
 import subprocess, os.path
 from enum import Enum
+import logging
 import sys
+
+logger = logging.getLogger(__name__)
 
 class Services(Enum):
     git_upload_pack = 'git-upload-pack'
