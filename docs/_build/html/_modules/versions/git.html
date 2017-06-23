@@ -185,13 +185,24 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">GitResponse</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GitResponse.set_response_header"><a class="viewcode-back" href="../../modules/versions.html#versions.git.GitResponse.set_response_header">[docs]</a>    <span class="k">def</span> <span class="nf">set_response_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Writes the required headers for a git handshake</span>
+
+<span class="sd">        Primarily disables caching and sets the content type to the requested service and action</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="s1">&#39;Expires&#39;</span><span class="p">,</span> <span class="s1">&#39;Fri, 01 Jan 1980 00:00:00 GMT&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="s1">&#39;Pragma&#39;</span><span class="p">,</span> <span class="s1">&#39;no-cache&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="s1">&#39;Cache-Control&#39;</span><span class="p">,</span> <span class="s1">&#39;no-cache, max-age=0, must-revalidate&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s1">&#39;application/x-</span><span class="si">{0}</span><span class="s1">-</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="GitResponse.set_response_first_line"><a class="viewcode-back" href="../../modules/versions.html#versions.git.GitResponse.set_response_first_line">[docs]</a>    <span class="k">def</span> <span class="nf">set_response_first_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; e.g. 001f# service=git-receive-pack &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Writes the first line of the responses body</span>
+
+<span class="sd">        Constructs a line to detail the service of the current request. Adds the a prefix</span>
+<span class="sd">        (total line length in hex) to tell the client where the payload starts.</span>
+
+<span class="sd">        e.g. 001f# service=git-receive-pack0000</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">service</span> <span class="o">=</span> <span class="s1">&#39;# service=</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">service</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span>
@@ -199,6 +210,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0}{1}</span><span class="s1">0000&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">service</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="GitResponse.set_response_payload"><a class="viewcode-back" href="../../modules/versions.html#versions.git.GitResponse.set_response_payload">[docs]</a>    <span class="k">def</span> <span class="nf">set_response_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Executes the service requested and writes the data to the payload</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            payload_type (plumbing): git plumbing call initiated by the request.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="n">payload_type</span> <span class="o">==</span> <span class="n">plumbing</span><span class="o">.</span><span class="n">git_info_refs</span><span class="p">:</span>
             <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                                         <span class="s1">&#39;--stateless-rpc&#39;</span><span class="p">,</span>
@@ -227,6 +244,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="GitResponse.get_http_info_refs"><a class="viewcode-back" href="../../modules/versions.html#versions.git.GitResponse.get_http_info_refs">[docs]</a>    <span class="k">def</span> <span class="nf">get_http_info_refs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates a response for git&#39;s info_refs request</span>
+
+<span class="sd">        Sets the headers, generates the first line of the request, and adds</span>
+<span class="sd">        the info_refs functions data to the payload.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GitResponse: An HttpResponse for the handshake response for the info_refs function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_response_header</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_response_first_line</span><span class="p">()</span>
@@ -236,6 +262,15 @@
             <span class="k">return</span> <span class="n">get_http_error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GitResponse.get_http_service_rpc"><a class="viewcode-back" href="../../modules/versions.html#versions.git.GitResponse.get_http_service_rpc">[docs]</a>    <span class="k">def</span> <span class="nf">get_http_service_rpc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initiates a git plumbing rpc call depending on the received service request</span>
+
+<span class="sd">        Sets the headers and sets the payload to the data generated by receive_pack or</span>
+<span class="sd">        upload_pack depending on whether the request is a push or a pull respectively.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GitResponse: An HttpResponse containing the data requested by git&#39;s service call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_response_header</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">==</span> <span class="n">Services</span><span class="o">.</span><span class="n">git_receive_pack</span><span class="p">:</span>

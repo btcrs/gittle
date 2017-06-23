@@ -168,33 +168,101 @@
     <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;result&#39;</span></div>
 
 <div class="viewcode-block" id="parse_file_tree"><a class="viewcode-back" href="../../modules/versions.html#versions.views.parse_file_tree">[docs]</a><span class="k">def</span> <span class="nf">parse_file_tree</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Parses the repository&#39;s tree structure</span>
+
+<span class="sd">    Constructs a nested dictionary for the repositories commit tree. Blob IDs</span>
+<span class="sd">    and types are stored in orderto be returned as JSON.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        repo (Repository): The user&#39;s repository object.</span>
+<span class="sd">        tree (Tree): The most recent commit tree.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: A tree structure representing the current commits file hierarchy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">return</span> <span class="p">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">parse_file_tree</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">repo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">))</span> <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;tree&#39;</span>
             <span class="k">else</span> <span class="p">{</span><span class="s1">&#39;oid&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">type</span><span class="p">)}</span>
             <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tree</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="create"><a class="viewcode-back" href="../../modules/versions.html#versions.views.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project_name</span><span class="p">):</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;./repos&quot;</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot; Creates a bare repository with the provided name</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (string): The user&#39;s name.</span>
+<span class="sd">        project_name (string): The user&#39;s repository name.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HttpResponse: A message indicating the success or failure of the create</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;./repos&quot;</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
     <span class="n">pygit2</span><span class="o">.</span><span class="n">init_repository</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Created at </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="show_file"><a class="viewcode-back" href="../../modules/versions.html#versions.views.show_file">[docs]</a><span class="k">def</span> <span class="nf">show_file</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project_name</span><span class="p">,</span> <span class="n">oid</span><span class="p">):</span>
-    <span class="n">repo</span> <span class="o">=</span> <span class="n">pygit2</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;./repos&#39;</span><span class="p">,</span> <span class="n">project_name</span><span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot; Grabs and returns a single file from a user&#39;s repository</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (string): The user&#39;s name.</span>
+<span class="sd">        project_name (string): The user&#39;s repository name.</span>
+<span class="sd">        oid (string): The hash of the blob.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        JsonResponse: An object with the requested file&#39;s data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">repo</span> <span class="o">=</span> <span class="n">pygit2</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;./repos&#39;</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project_name</span><span class="p">))</span>
     <span class="n">blob</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">oid</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">blob</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)})</span></div>
 
 <div class="viewcode-block" id="list_files"><a class="viewcode-back" href="../../modules/versions.html#versions.views.list_files">[docs]</a><span class="k">def</span> <span class="nf">list_files</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project_name</span><span class="p">):</span>
-    <span class="n">repo</span> <span class="o">=</span> <span class="n">pygit2</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;./repos&quot;</span><span class="p">,</span> <span class="n">project_name</span><span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot; Grabs and returns all files from a user&#39;s repository</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (string): The user&#39;s name.</span>
+<span class="sd">        project_name (string): The user&#39;s repository name.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        JsonResponse: An object with the requested repository&#39;s files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">repo</span> <span class="o">=</span> <span class="n">pygit2</span><span class="o">.</span><span class="n">Repository</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;./repos&quot;</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project_name</span><span class="p">))</span>
     <span class="n">tree</span> <span class="o">=</span> <span class="n">repo</span><span class="o">.</span><span class="n">revparse_single</span><span class="p">(</span><span class="s1">&#39;master&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tree</span>
     <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">parse_file_tree</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">tree</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="info_refs"><a class="viewcode-back" href="../../modules/versions.html#versions.views.info_refs">[docs]</a><span class="k">def</span> <span class="nf">info_refs</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_name</span><span class="p">):</span>
-    <span class="n">requested_repo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;./repos&#39;</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
+<div class="viewcode-block" id="info_refs"><a class="viewcode-back" href="../../modules/versions.html#versions.views.info_refs">[docs]</a><span class="k">def</span> <span class="nf">info_refs</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Initiates a handshake for a smart HTTP connection</span>
+
+<span class="sd">    https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (string): The user&#39;s name.</span>
+<span class="sd">        project_name (string): The user&#39;s repository name.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        GitResponse: A HttpResponse with the proper headers and payload needed by git.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">requested_repo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;./repos&#39;</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">GitResponse</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s1">&#39;service&#39;</span><span class="p">],</span> <span class="n">action</span><span class="o">=</span><span class="n">Actions</span><span class="o">.</span><span class="n">advertisement</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                            <span class="n">repository</span><span class="o">=</span><span class="n">requested_repo</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">get_http_info_refs</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="service_rpc"><a class="viewcode-back" href="../../modules/versions.html#versions.views.service_rpc">[docs]</a><span class="k">def</span> <span class="nf">service_rpc</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">project_name</span><span class="p">):</span>
-    <span class="n">requested_repo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;./repos&#39;</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
+<div class="viewcode-block" id="service_rpc"><a class="viewcode-back" href="../../modules/versions.html#versions.views.service_rpc">[docs]</a><span class="k">def</span> <span class="nf">service_rpc</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calls the Git commands to pull or push data from the server depending on the received service.</span>
+
+<span class="sd">    https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user (string): The user&#39;s name.</span>
+<span class="sd">        project_name (string): The user&#39;s repository name.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        GitResponse: An HttpResponse that indicates success or failure and may include the requested packfile</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">requested_repo</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;./repos&#39;</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project_name</span><span class="p">)</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">GitResponse</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">path_info</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">action</span><span class="o">=</span><span class="n">Actions</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                            <span class="n">repository</span><span class="o">=</span><span class="n">requested_repo</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">get_http_service_rpc</span><span class="p">()</span></div>

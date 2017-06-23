@@ -1,36 +1,13 @@
 versions package
 ================
 
-Subpackages
------------
-
-.. toctree::
-
-    versions.migrations
-
 Submodules
 ----------
-
-versions\.admin module
-----------------------
-
-.. automodule:: versions.admin
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 versions\.git module
 --------------------
 
 .. automodule:: versions.git
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-versions\.models module
------------------------
-
-.. automodule:: versions.models
     :members:
     :undoc-members:
     :show-inheritance:
