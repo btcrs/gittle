@@ -5,6 +5,7 @@ from time import time
 from enum import Enum
 import os.path
 import pygit2
+import shutil
 import json
 import os
 
@@ -46,6 +47,21 @@ def create(request, user, project_name):
     signature = Signature(user, '{}@example.com'.format(user), int(time()), 0)
     commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', precommit, [])
     return HttpResponse("Created at {}".format(path))
+
+def delete(request, user, project_name):
+    """ Deletes the repository with the provided name
+
+    Args:
+        user (string): The user's name.
+        project_name (string): The user's repository name.
+
+    Returns:
+        HttpResponse: A message indicating the success or failure of the delete
+    """
+
+    path = os.path.join("./repos", user, project_name)
+    shutil.rmtree(path)
+    return HttpResponse("Delted {}".format(path))
 
 def show_file(request, user, project_name, oid):
     """ Grabs and returns a single file from a user's repository
