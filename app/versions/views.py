@@ -9,23 +9,19 @@ class Actions(Enum):
     advertisement = 'advertisement'
     result = 'result'
 
-def parse_file_tree(repo, tree):
+def parse_file_tree(tree):
     """ Parses the repository's tree structure
 
-    Constructs a nested dictionary for the repositories commit tree. Blob IDs
-    and types are stored in orderto be returned as JSON.
+    Returns a list of objects and metadata in the top level of the provided tree
 
     Args:
-        repo (Repository): The user's repository object.
         tree (Tree): The most recent commit tree.
 
     Returns:
-        dict: A tree structure representing the current commits file hierarchy.
+        dict: A list of all files in the top level of the provided tree.
     """
 
-    return {node.name: parse_file_tree(repo, repo.get(node.id)) if node.type == 'tree'
-            else {'oid': str(node.id), 'type': str(node.type)}
-            for node in tree}
+    return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
 def create(request, user, project_name):
     """ Creates a bare repository with the provided name
@@ -45,6 +41,9 @@ def create(request, user, project_name):
 def show_file(request, user, project_name, oid):
     """ Grabs and returns a single file from a user's repository
 
+    if the requested object is a tree the function parses it intstead
+    of returning blindly.
+
     Args:
         user (string): The user's name.
         project_name (string): The user's repository name.
@@ -56,6 +55,8 @@ def show_file(request, user, project_name, oid):
 
     repo = pygit2.Repository(os.path.join('./repos', user, project_name))
     blob = repo.get(oid)
+    if type(blob) == pygit2.Tree:
+        return JsonResponse(parse_file_tree(blob))
     return JsonResponse({'file': str(blob.data, 'utf-8')})
 
 def list_files(request, user, project_name):
@@ -71,7 +72,7 @@ def list_files(request, user, project_name):
 
     repo = pygit2.Repository(os.path.join("./repos", user, project_name))
     tree = repo.revparse_single('master').tree
-    return JsonResponse(parse_file_tree(repo, tree))
+    return JsonResponse(parse_file_tree(tree))
 
 def info_refs(request, user, project_name):
     """ Initiates a handshake for a smart HTTP connection
