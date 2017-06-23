@@ -7,10 +7,13 @@ RUN cd libgit2-0.25.0 \
     && cmake . \
     && make \
     && make install
-RUN pip install pygit2
-RUN pip install django
+
 RUN pip install sphinx
 RUN pip install sphinx_rtd_theme
+
+RUN pip install pygit2
+RUN pip install django
+RUN pip3 install django-cors-headers
 RUN ldconfig
 
 
