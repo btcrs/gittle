@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     url(r'^create/(?P<user>\w+)/(?P<project_name>\w+)$', views.create, name='create'),
+    url(r'^delete/(?P<user>\w+)/(?P<project_name>\w+)$', views.delete, name='delete'),
     url(r'^(?P<user>\w+)/(?P<project_name>\w+)/(?P<oid>\w+)$', views.show_file, name='show-file'),
     url(r'^(?P<user>\w+)/(?P<project_name>\w+)$', views.list_files, name='list-files'),
     url(r'^(?P<user>\w+)$', views.list_repos, name='list-repos'),
