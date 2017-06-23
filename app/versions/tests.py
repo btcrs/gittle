@@ -1,9 +1,11 @@
 from django.test import TestCase
 from pygit2 import repository
+import os
 
 class VersionsViewsTestCase(TestCase):
     def test_create(self):
         response = self.client.get('/create/testuser/testapp')
+        print(response)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Created at ./repos/testuser/testapp' in response.context)
 
@@ -13,6 +15,8 @@ class VersionsViewsTestCase(TestCase):
         self.assertTrue(repo.is_bare)
 
     def test_list_files(self):
+        path = os.path.join("./repos", testuser, testapp, '.git')
+        repo = Repository(path)
         one = repo.create_blob('test file')
         two = repo.create_blob('test file 2')
         three = repo.create_blob('test file 3')
