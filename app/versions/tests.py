@@ -39,6 +39,7 @@ class VersionsViewsTestCase(TestCase):
         self.assertTrue(repo.is_bare)
 
     def test_list_files(self):
+        self.create_directory_structure()
         response = self.client.get('/testuser/testapp')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'testfile1.txt' in response.content)
