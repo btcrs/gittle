@@ -1,4 +1,5 @@
 app/repos/*
 **/.DS_Store
+*.pyc
 /test
 __pycache__

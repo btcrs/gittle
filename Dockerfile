@@ -9,6 +9,8 @@ RUN cd libgit2-0.25.0 \
     && make install
 RUN pip install pygit2
 RUN pip install django
+RUN pip install sphinx
+RUN pip install sphinx_rtd_theme
 RUN ldconfig
 
 
