@@ -137,14 +137,14 @@ LOGGING = {
             'backupCount': 7,
             'formatter': 'main_formatter',
             'filters': ['require_debug_true'],
-        }
+        },
         'null': {
-            "class": 'django.utils.log.NullHandler',
+            "class": 'logging.NullHandler',
         }
     },
     'loggers': {
         'django.request': {
-        'handlers': ['mail_admins', 'console'],
+        'handlers': ['console'],
         'level': 'ERROR',
         'propagate': True,
         },

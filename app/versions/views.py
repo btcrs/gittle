@@ -1,11 +1,15 @@
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
+from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
 from .git import GitResponse
+from urllib import parse
 from time import time
 from enum import Enum
 import logging
 import os.path
 import pygit2
+import urllib
+import requests
 import shutil
 import json
 import os
@@ -22,14 +26,24 @@ def login(request):
     password = request.POST.get('password')
     body = {'username': username , 'password': password, 'grant_type': 'password'}
     url = "https://dev.wevolver.com/o/proxy-client-token"
-    encoded_body = parse.urlencode(body).encode('utf-8')
-    response = request.urlopen(url, encoded_body).read().decode('utf-8')
-    logger.debug("Response: {}".format(response))
-    return HttpResponse(response)
+    response = requests.post(url, params=body)
+    logger.debug(response.text)
+    return HttpResponse(response.text)
 
 @require_http_methods(["POST"])
-def refresh():
-    pass
+def refresh(request):
+    client_id = request.POST.get('client_id')
+    client_secret = request.POST.get('client_secret')
+    refresh_token = request.POST.get('refresh_token')
+    body = {'client_id': client_id,
+            'client_secret': client_secret,
+            'grant_type': 'refresh_token', 
+            'refresh_token': refresh_token
+           }
+    url = "https://dev.wevolver.com/o/token"
+    response = requests.post(url, params=body)
+    logger.debug(response.text)
+    return HttpResponse(response.text)
 
 def parse_file_tree(tree):
     """ Parses the repository's tree structure

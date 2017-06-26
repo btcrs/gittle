@@ -1,4 +1,5 @@
 app/repos/*
+app/logs
 **/.DS_Store
 *.pyc
 /test
