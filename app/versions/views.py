@@ -61,7 +61,7 @@ def delete(request, user, project_name):
 
     path = os.path.join("./repos", user, project_name)
     shutil.rmtree(path)
-    return HttpResponse("Delted {}".format(path))
+    return HttpResponse("Deleted repository at {}".format(path))
 
 def show_file(request, user, project_name, oid):
     """ Grabs and returns a single file from a user's repository
