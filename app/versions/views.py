@@ -16,6 +16,21 @@ class Actions(Enum):
     advertisement = 'advertisement'
     result = 'result'
 
+@require_http_methods(["POST"])
+def login(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    body = {'username': username , 'password': password, 'grant_type': 'password'}
+    url = "https://dev.wevolver.com/o/proxy-client-token"
+    encoded_body = parse.urlencode(body).encode('utf-8')
+    response = request.urlopen(url, encoded_body).read().decode('utf-8')
+    logger.debug("Response: {}".format(response))
+    return HttpResponse(response)
+
+@require_http_methods(["POST"])
+def refresh():
+    pass
+
 def parse_file_tree(tree):
     """ Parses the repository's tree structure
 
