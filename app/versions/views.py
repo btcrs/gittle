@@ -16,12 +16,24 @@ import json
 import os
 logger = logging.getLogger(__name__)
 
+def refresh(client_id, client_secret, refresh_token):
+    body = {'client_id': client_id,
+            'client_secret': client_secret,
+            'grant_type': 'refresh_token',
+            'refresh_token': refresh_token
+           }
+    url = "https://dev.wevolver.com/o/token"
+    response = requests.post(url, data=body)
+    logger.debug(response.text)
+    logger.debug(response.status_code)
+    return response.status_code == requests.codes.ok
+
 def poor_auth(function):
     def wrap(request, *args, **kwargs):
-        id = request.GET.get('client_id')
-        secret = request.GET.get('client_secret')
-        refresh = request.GET.get('refresh_token')
-        if refresh(id, secret, refresh):
+        client_id = request.GET.get('client_id')
+        client_secret = request.GET.get('client_secret')
+        refresh_token = request.GET.get('refresh_token')
+        if refresh(client_id, client_secret, refresh_token):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
@@ -38,21 +50,12 @@ class Actions(Enum):
 def login(request):
     username = request.POST.get('username')
     password = request.POST.get('password')
-    body = {'username': username , 'password': password, 'grant_type': 'password'}
+    body = {'username': str(username), 'password': str(password), 'grant_type': 'password'}
     url = "https://dev.wevolver.com/o/proxy-client-token"
-    response = requests.post(url, params=body)
+    response = requests.post(url, data=body)
+    logger.debug("RESPONSE {}".format(response.text))
     logger.debug(response.text)
     return HttpResponse(response.text)
-
-def refresh(id, secret, refresh):
-    body = {'client_id': id,
-            'client_secret': secret,
-            'grant_type': 'refresh_token',
-            'refresh_token': refresh
-           }
-    url = "https://dev.wevolver.com/o/token"
-    response = requests.post(url, params=body)
-    return response.status_code is requests.codes.ok
 
 def parse_file_tree(tree):
     """ Parses the repository's tree structure
@@ -91,6 +94,7 @@ def create(request, user, project_name):
     commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', precommit, [])
     return HttpResponse("Created at {}".format(path))
 
+@poor_auth
 def delete(request, user, project_name):
     """ Deletes the repository with the provided name
 
@@ -106,6 +110,7 @@ def delete(request, user, project_name):
     shutil.rmtree(path)
     return HttpResponse("Deleted repository at {}".format(path))
 
+@poor_auth
 def show_file(request, user, project_name, oid):
     """ Grabs and returns a single file from a user's repository
 
@@ -127,6 +132,7 @@ def show_file(request, user, project_name, oid):
         return JsonResponse(parse_file_tree(blob))
     return JsonResponse({'file': str(blob.data, 'utf-8')})
 
+@poor_auth
 def list_files(request, user, project_name):
     """ Grabs and returns all files from a user's repository
 
@@ -142,6 +148,7 @@ def list_files(request, user, project_name):
     tree = repo.revparse_single('master').tree
     return JsonResponse(parse_file_tree(tree))
 
+@poor_auth
 def list_repos(request, user):
     """ Grabs and returns all of a user's repository
 
@@ -156,6 +163,7 @@ def list_repos(request, user):
     directories = [name for name in os.listdir(path)]
     return JsonResponse({'data': directories})
 
+@poor_auth
 def info_refs(request, user, project_name):
     """ Initiates a handshake for a smart HTTP connection
 
@@ -174,6 +182,7 @@ def info_refs(request, user, project_name):
                            repository=requested_repo, data=None)
     return response.get_http_info_refs()
 
+@poor_auth
 def service_rpc(request, user, project_name):
     """ Calls the Git commands to pull or push data from the server depending on the received service.
 
