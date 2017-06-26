@@ -3,11 +3,14 @@ from django.http import HttpResponse, JsonResponse
 from .git import GitResponse
 from time import time
 from enum import Enum
+import logging
 import os.path
 import pygit2
 import shutil
 import json
 import os
+
+logger = logging.getLogger(__name__)
 
 class Actions(Enum):
     advertisement = 'advertisement'
@@ -25,6 +28,7 @@ def parse_file_tree(tree):
         dict: A list of all files in the top level of the provided tree.
     """
 
+    logging.debug("Given tree is type {}".format(type(tree)))
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
 def create(request, user, project_name):
