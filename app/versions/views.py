@@ -1,5 +1,6 @@
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from django.views.decorators.http import require_http_methods
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from .git import GitResponse
 from urllib import parse
@@ -13,8 +14,21 @@ import requests
 import shutil
 import json
 import os
-
 logger = logging.getLogger(__name__)
+
+def poor_auth(function):
+    def wrap(request, *args, **kwargs):
+        id = request.GET.get('client_id')
+        secret = request.GET.get('client_secret')
+        refresh = request.GET.get('refresh_token')
+        if refresh(id, secret, refresh):
+            return function(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap
 
 class Actions(Enum):
     advertisement = 'advertisement'
@@ -30,20 +44,15 @@ def login(request):
     logger.debug(response.text)
     return HttpResponse(response.text)
 
-@require_http_methods(["POST"])
-def refresh(request):
-    client_id = request.POST.get('client_id')
-    client_secret = request.POST.get('client_secret')
-    refresh_token = request.POST.get('refresh_token')
-    body = {'client_id': client_id,
-            'client_secret': client_secret,
-            'grant_type': 'refresh_token', 
-            'refresh_token': refresh_token
+def refresh(id, secret, refresh):
+    body = {'client_id': id,
+            'client_secret': secret,
+            'grant_type': 'refresh_token',
+            'refresh_token': refresh
            }
     url = "https://dev.wevolver.com/o/token"
     response = requests.post(url, params=body)
-    logger.debug(response.text)
-    return HttpResponse(response.text)
+    return response.status_code is requests.codes.ok
 
 def parse_file_tree(tree):
     """ Parses the repository's tree structure
@@ -60,6 +69,7 @@ def parse_file_tree(tree):
     logging.debug("Given tree is type {}".format(type(tree)))
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
+@poor_auth
 def create(request, user, project_name):
     """ Creates a bare repository with the provided name
 
