@@ -1,78 +1,23 @@
-from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from django.views.decorators.http import require_http_methods
-from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
+
+from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
+from .decorators import git_access_required, auth
 from .git import GitResponse
 from urllib import parse
 from time import time
 from enum import Enum
+
+import requests
 import logging
 import os.path
 import pygit2
 import urllib
-import requests
 import shutil
 import json
 import os
-import base64
-from functools import wraps
 
 logger = logging.getLogger(__name__)
-
-def base_auth(authorization_header):
-    authmeth, auth = authorization_header.split(' ', 1)
-    if authmeth.lower() == 'basic':
-        auth = base64.b64decode(auth.strip()).decode('utf8')
-        username, password = auth.split(':', 1)
-        username = username
-        password = password
-        body = {'username': str(username), 'password': str(password), 'grant_type': 'password'}
-        url = "https://dev.wevolver.com/o/proxy-client-token"
-        response = requests.post(url, data=body)
-        return response
-    else:
-        return None
-
-def git_access_required(func):
-    @wraps(func)
-    def _decorator(request, *args, **kwargs):
-        if request.META.get('HTTP_AUTHORIZATION'):
-            user = base_auth(request.META['HTTP_AUTHORIZATION'])
-            if user:
-                return func(request, *args, **kwargs)
-            else:
-                return HttpResponseForbidden('Access forbidden.')
-        res = HttpResponse()
-        res.status_code = 401
-        res['WWW-Authenticate'] = 'Basic'
-        return res
-    return _decorator
-
-def refresh(client_id, client_secret, refresh_token):
-    body = {'client_id': client_id,
-            'client_secret': client_secret,
-            'grant_type': 'refresh_token',
-            'refresh_token': refresh_token
-           }
-    url = "https://dev.wevolver.com/o/token"
-    response = requests.post(url, data=body)
-    logger.debug(response.text)
-    logger.debug(response.status_code)
-    return response.status_code == requests.codes.ok
-
-def poor_auth(function):
-    def wrap(request, *args, **kwargs):
-        client_id = request.GET.get('client_id')
-        client_secret = request.GET.get('client_secret')
-        refresh_token = request.GET.get('refresh_token')
-        if refresh(client_id, client_secret, refresh_token):
-            return function(request, *args, **kwargs)
-        else:
-            raise PermissionDenied
-
-    wrap.__doc__ = function.__doc__
-    wrap.__name__ = function.__name__
-    return wrap
 
 class Actions(Enum):
     advertisement = 'advertisement'
@@ -80,13 +25,12 @@ class Actions(Enum):
 
 @require_http_methods(["POST"])
 def login(request):
-    username = request.POST.get('username')
-    password = request.POST.get('password')
-    body = {'username': str(username), 'password': str(password), 'grant_type': 'password'}
+    logger.debug(request.body)
+    post = json.loads(request.body)
+    body = {'username': post['username'], 'password': post['password'], 'grant_type': 'password'}
     url = "https://dev.wevolver.com/o/proxy-client-token"
     response = requests.post(url, data=body)
-    logger.debug("RESPONSE {}".format(response.text))
-    logger.debug(response.text)
+    logger.debug(response)
     return HttpResponse(response.text)
 
 def parse_file_tree(tree):
@@ -104,7 +48,7 @@ def parse_file_tree(tree):
     logging.debug("Given tree is type {}".format(type(tree)))
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
-@poor_auth
+@auth
 def create(request, user, project_name):
     """ Creates a bare repository with the provided name
 
@@ -126,7 +70,7 @@ def create(request, user, project_name):
     commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', precommit, [])
     return HttpResponse("Created at {}".format(path))
 
-@poor_auth
+@auth
 def delete(request, user, project_name):
     """ Deletes the repository with the provided name
 
@@ -142,7 +86,7 @@ def delete(request, user, project_name):
     shutil.rmtree(path)
     return HttpResponse("Deleted repository at {}".format(path))
 
-@poor_auth
+@auth
 def show_file(request, user, project_name, oid):
     """ Grabs and returns a single file from a user's repository
 
@@ -164,7 +108,7 @@ def show_file(request, user, project_name, oid):
         return JsonResponse(parse_file_tree(blob))
     return JsonResponse({'file': str(blob.data, 'utf-8')})
 
-@poor_auth
+@auth
 def list_files(request, user, project_name):
     """ Grabs and returns all files from a user's repository
 
@@ -179,7 +123,6 @@ def list_files(request, user, project_name):
     repo = pygit2.Repository(os.path.join("./repos", user, project_name))
     tree = repo.revparse_single('master').tree
     return JsonResponse(parse_file_tree(tree))
-
 @git_access_required
 def list_repos(request, user):
     """ Grabs and returns all of a user's repository

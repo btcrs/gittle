@@ -14,6 +14,7 @@ RUN pip install sphinx_rtd_theme
 RUN pip install pygit2
 RUN pip install django
 RUN pip3 install django-cors-headers
+RUN pip install django-robots
 RUN ldconfig
 
 
