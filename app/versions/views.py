@@ -1,18 +1,12 @@
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
-from django.http import HttpResponseForbidden
-from django.core.exceptions import PermissionDenied
-from functools import wraps
-import base64
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
-from .git import GitResponse
-from .auth import basic_auth
 from .decorators import git_access_required, wevolver_auth
+from .git import GitResponse
 from urllib import parse
 from time import time
 from enum import Enum
-
 import requests
 import logging
 import os.path

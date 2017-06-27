@@ -8,23 +8,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def authorize(authorization, user):
-    url = "https://dev.wevolver.com/api/2/users/{}/checktoken/".format(user)
-    headers = {'Authorization': 'Bearer {}'.format(authorization)}
-    response = requests.get(url, headers=headers)
-    return response.status_code == requests.codes.ok
-
-def auth(func):
-    @wraps(func)
-    def _decorator(request, *args, **kwargs):
-        headers = request.GET.get("access_token")
-        user = request.GET.get("user_id")
-        if authorize(headers, user):
-            return func(request, *args, **kwargs)
-        else:
-            raise PermissionDenied
-    return _decorator
-
 def refresh(user, authorization):
     url = "https://dev.wevolver.com/api/2/users/{}/checktoken/".format(user)
     headers = {'Authorization': 'Bearer {}'.format(authorization)}
