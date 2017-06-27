@@ -42,10 +42,10 @@ def git_access_required(func):
                 return func(request, *args, **kwargs)
             else:
                 return HttpResponseForbidden('Access forbidden.')
-         res = HttpResponse()
-         res.status_code = 401
-         res['WWW-Authenticate'] = 'Basic'
-         return res
+        res = HttpResponse()
+        res.status_code = 401
+        res['WWW-Authenticate'] = 'Basic'
+        return res
     return _decorator
 
 def refresh(client_id, client_secret, refresh_token):
