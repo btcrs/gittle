@@ -1,19 +1,21 @@
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
 from django.core.exceptions import PermissionDenied
-from functools import wraps
-import base64
-import tarfile
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from .decorators import git_access_required, wevolver_auth
 from .git import GitResponse
+from functools import wraps
 from urllib import parse
 from time import time
 from enum import Enum
+
 import requests
 import logging
 import os.path
+import tarfile
+import hashlib
+import base64
 import pygit2
 import urllib
 import shutil
@@ -35,6 +37,16 @@ def login(request):
     response = requests.post(url, data=body)
     logger.debug(response)
     return HttpResponse(response.text)
+
+def generate_directory(username):
+    """
+    https://github.com/blog/117-scaling-lesson-23742
+    """
+    hash = hashlib.md5();
+    hash.update(username.encode('utf-8'))
+    hash = hash.hexdigest()
+    a, b, c, d, *rest= hash[0], hash[1:3], hash[3:5], hash[5:7]
+    return os.path.join(a, b, c, d, username)
 
 def parse_file_tree(tree):
     """ Parses the repository's tree structure
@@ -63,7 +75,11 @@ def create(request, user, project_name):
         HttpResponse: A message indicating the success or failure of the create
     """
 
-    path = os.path.join("./repos", user, project_name)
+    directory = generate_directory(user)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    path = os.path.join("./repos", directory, project_name)
     repo = pygit2.init_repository(path, True)
     readme = repo.create_blob('#Hello, World!')
     master = repo.TreeBuilder()
@@ -85,7 +101,8 @@ def delete(request, user, project_name):
         HttpResponse: A message indicating the success or failure of the delete
     """
 
-    path = os.path.join("./repos", user, project_name)
+    directory = generate_directory(user)
+    path = os.path.join("./repos", directory, project_name)
     shutil.rmtree(path)
     return HttpResponse("Deleted repository at {}".format(path))
 
@@ -105,7 +122,8 @@ def show_file(request, user, project_name, oid):
         JsonResponse: An object with the requested file's data
     """
 
-    repo = pygit2.Repository(os.path.join('./repos', user, project_name))
+    directory = generate_directory(user)
+    repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
     blob = repo.get(oid)
     if type(blob) == pygit2.Tree:
         return JsonResponse(parse_file_tree(blob))
@@ -123,7 +141,8 @@ def list_files(request, user, project_name):
         JsonResponse: An object with the requested repository's files
     """
 
-    repo = pygit2.Repository(os.path.join("./repos", user, project_name))
+    directory = generate_directory(user)
+    repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
     tree = repo.revparse_single('master').tree
     return JsonResponse(parse_file_tree(tree))
 
@@ -138,8 +157,9 @@ def list_repos(request, user):
         JsonResponse: An object with the requested user's repositories
     """
 
-    path = os.path.join("./repos", user)
-    directories = [name for name in os.listdir(path)]
+    directory = generate_directory(user)
+    path = os.path.join("./repos", directory)
+    directories = [name for name in os.listdir(path)] if os.path.exists(path) else []
     return JsonResponse({'data': directories})
 
 @wevolver_auth
@@ -158,8 +178,9 @@ def download_archive(request, user, project_name):
     response = HttpResponse(content_type='application/x-gzip')
     response['Content-Disposition'] = 'attachment; filename=' + filename
 
+    directory = generate_directory(user)
     with tarfile.open(fileobj=response, mode='w') as archive:
-        repo = pygit2.Repository(os.path.join("./repos", user, project_name))
+        repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
         repo.write_archive(repo.head.target, archive)
 
     return response
@@ -178,7 +199,8 @@ def info_refs(request, user, project_name):
         GitResponse: A HttpResponse with the proper headers and payload needed by git.
     """
 
-    requested_repo = os.path.join('./repos', user, project_name)
+    directory = generate_directory(user)
+    requested_repo = os.path.join('./repos', directory, project_name)
     response = GitResponse(service=request.GET['service'], action=Actions.advertisement.value,
                            repository=requested_repo, data=None)
     return response.get_http_info_refs()
@@ -197,7 +219,8 @@ def service_rpc(request, user, project_name):
         GitResponse: An HttpResponse that indicates success or failure and may include the requested packfile
     """
 
-    requested_repo = os.path.join('./repos', user, project_name)
+    directory = generate_directory(user)
+    requested_repo = os.path.join('./repos', directory, project_name)
     response = GitResponse(service=request.path_info.split('/')[-1], action=Actions.result.value,
                            repository=requested_repo, data=request.body)
     return response.get_http_service_rpc()
