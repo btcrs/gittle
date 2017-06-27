@@ -1,5 +1,6 @@
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
+from functools import wraps
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from .decorators import git_access_required, auth, test
@@ -18,6 +19,61 @@ import json
 import os
 
 logger = logging.getLogger(__name__)
+
+def base_auth(authorization_header):
+    authmeth, auth = authorization_header.split(' ', 1)
+    if authmeth.lower() == 'basic':
+        auth = base64.b64decode(auth.strip()).decode('utf8')
+        username, password = auth.split(':', 1)
+        username = username
+        password = password
+        body = {'username': str(username), 'password': str(password), 'grant_type': 'password'}
+        url = "https://dev.wevolver.com/o/proxy-client-token"
+        response = requests.post(url, data=body)
+        return response
+    else:
+        return None
+
+def git_access_required(func):
+    @wraps(func)
+    def _decorator(request, *args, **kwargs):
+        if request.META.get('HTTP_AUTHORIZATION'):
+            user = base_auth(request.META['HTTP_AUTHORIZATION'])
+            if user:
+                return func(request, *args, **kwargs)
+            else:
+                return HttpResponseForbidden('Access forbidden.')
+        res = HttpResponse()
+        res.status_code = 401
+        res['WWW-Authenticate'] = 'Basic'
+        return res
+    return _decorator
+
+def refresh(client_id, client_secret, refresh_token):
+    body = {'client_id': client_id,
+            'client_secret': client_secret,
+            'grant_type': 'refresh_token',
+            'refresh_token': refresh_token
+           }
+    url = "https://dev.wevolver.com/o/token"
+    response = requests.post(url, data=body)
+    logger.debug(response.text)
+    logger.debug(response.status_code)
+    return response.status_code == requests.codes.ok
+
+def poor_auth(function):
+    def wrap(request, *args, **kwargs):
+        client_id = request.GET.get('client_id')
+        client_secret = request.GET.get('client_secret')
+        refresh_token = request.GET.get('refresh_token')
+        if refresh(client_id, client_secret, refresh_token):
+            return function(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap
 
 class Actions(Enum):
     advertisement = 'advertisement'
