@@ -2,7 +2,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
-from .decorators import git_access_required, auth
+from .decorators import git_access_required, auth, test
 from .git import GitResponse
 from urllib import parse
 from time import time
@@ -108,6 +108,7 @@ def show_file(request, user, project_name, oid):
         return JsonResponse(parse_file_tree(blob))
     return JsonResponse({'file': str(blob.data, 'utf-8')})
 
+@test
 @auth
 def list_files(request, user, project_name):
     """ Grabs and returns all files from a user's repository

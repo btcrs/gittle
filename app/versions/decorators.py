@@ -14,19 +14,14 @@ def authorize(authorization, user):
     response = requests.get(url, headers=headers)
     return response.status_code == requests.codes.ok
 
-def auth(func):
+def test(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
-        headers = request.GET.get("access_token")
-        user = request.GET.get("user_id")
-        print(user)
-        #if authorize(headers, user):
+        print('test')
         return func(request, *args, **kwargs)
-        #else:
-        #    raise PermissionDenied
     return _decorator
 
-def test(func):
+def auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
         headers = request.GET.get("access_token")
@@ -51,4 +46,3 @@ def git_access_required(func):
         res['WWW-Authenticate'] = 'Basic'
         return res
     return _decorator
-
