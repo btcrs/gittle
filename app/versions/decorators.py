@@ -14,13 +14,6 @@ def authorize(authorization, user):
     response = requests.get(url, headers=headers)
     return response.status_code == requests.codes.ok
 
-def test(func):
-    @wraps(func)
-    def _decorator(request, *args, **kwargs):
-        print('test')
-        return func(request, *args, **kwargs)
-    return _decorator
-
 def auth(func):
     @wraps(func)
     def _decorator(request, *args, **kwargs):
@@ -31,6 +24,25 @@ def auth(func):
         else:
             raise PermissionDenied
     return _decorator
+
+def refresh(user, authorization):
+    url = "https://dev.wevolver.com/api/2/users/{}/checktoken/".format(user)
+    headers = {'Authorization': 'Bearer {}'.format(authorization)}
+    response = requests.get(url, headers=headers)
+    return response.status_code == requests.codes.ok
+
+def wevolver_auth(function):
+    def wrap(request, *args, **kwargs):
+        headers = request.GET.get("access_token")
+        user = request.GET.get("user_id")
+        if refresh(user, headers):
+            return function(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap
 
 def git_access_required(func):
     @wraps(func)
