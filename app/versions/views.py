@@ -142,7 +142,7 @@ def list_repos(request, user):
     directories = [name for name in os.listdir(path)]
     return JsonResponse({'data': directories})
 
-@auth
+@wevolver_auth
 def download_archive(request, user, project_name):
     """ Grabs and returns all of a user's repository as a tarball
 
