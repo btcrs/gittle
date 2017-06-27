@@ -1,9 +1,10 @@
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
+from django.core.exceptions import PermissionDenied
 from functools import wraps
+import base64
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
-from .decorators import git_access_required, auth, test
 from .git import GitResponse
 from urllib import parse
 from time import time
@@ -49,24 +50,17 @@ def git_access_required(func):
         return res
     return _decorator
 
-def refresh(client_id, client_secret, refresh_token):
-    body = {'client_id': client_id,
-            'client_secret': client_secret,
-            'grant_type': 'refresh_token',
-            'refresh_token': refresh_token
-           }
-    url = "https://dev.wevolver.com/o/token"
-    response = requests.post(url, data=body)
-    logger.debug(response.text)
-    logger.debug(response.status_code)
+def refresh(user, authorization):
+    url = "https://dev.wevolver.com/api/2/users/{}/checktoken/".format(user)
+    headers = {'Authorization': 'Bearer {}'.format(authorization)}
+    response = requests.get(url, headers=headers)
     return response.status_code == requests.codes.ok
 
-def poor_auth(function):
+def auth(function):
     def wrap(request, *args, **kwargs):
-        client_id = request.GET.get('client_id')
-        client_secret = request.GET.get('client_secret')
-        refresh_token = request.GET.get('refresh_token')
-        if refresh(client_id, client_secret, refresh_token):
+        headers = request.GET.get("access_token")
+        user = request.GET.get("user_id")
+        if refresh(user, headers):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
@@ -164,7 +158,6 @@ def show_file(request, user, project_name, oid):
         return JsonResponse(parse_file_tree(blob))
     return JsonResponse({'file': str(blob.data, 'utf-8')})
 
-@test
 @auth
 def list_files(request, user, project_name):
     """ Grabs and returns all files from a user's repository
@@ -180,7 +173,8 @@ def list_files(request, user, project_name):
     repo = pygit2.Repository(os.path.join("./repos", user, project_name))
     tree = repo.revparse_single('master').tree
     return JsonResponse(parse_file_tree(tree))
-@git_access_required
+
+@auth
 def list_repos(request, user):
     """ Grabs and returns all of a user's repository
 
