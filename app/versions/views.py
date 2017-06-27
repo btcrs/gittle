@@ -6,11 +6,11 @@ import base64
 import tarfile
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
+from .decorators import git_access_required, wevolver_auth
 from .git import GitResponse
 from urllib import parse
 from time import time
 from enum import Enum
-
 import requests
 import logging
 import os.path
@@ -21,54 +21,6 @@ import json
 import os
 
 logger = logging.getLogger(__name__)
-
-def base_auth(authorization_header):
-    authmeth, auth = authorization_header.split(' ', 1)
-    if authmeth.lower() == 'basic':
-        auth = base64.b64decode(auth.strip()).decode('utf8')
-        username, password = auth.split(':', 1)
-        username = username
-        password = password
-        body = {'username': str(username), 'password': str(password), 'grant_type': 'password'}
-        url = "https://dev.wevolver.com/o/proxy-client-token"
-        response = requests.post(url, data=body)
-        return response
-    else:
-        return None
-
-def git_access_required(func):
-    @wraps(func)
-    def _decorator(request, *args, **kwargs):
-        if request.META.get('HTTP_AUTHORIZATION'):
-            user = base_auth(request.META['HTTP_AUTHORIZATION'])
-            if user:
-                return func(request, *args, **kwargs)
-            else:
-                return HttpResponseForbidden('Access forbidden.')
-        res = HttpResponse()
-        res.status_code = 401
-        res['WWW-Authenticate'] = 'Basic'
-        return res
-    return _decorator
-
-def refresh(user, authorization):
-    url = "https://dev.wevolver.com/api/2/users/{}/checktoken/".format(user)
-    headers = {'Authorization': 'Bearer {}'.format(authorization)}
-    response = requests.get(url, headers=headers)
-    return response.status_code == requests.codes.ok
-
-def auth(function):
-    def wrap(request, *args, **kwargs):
-        headers = request.GET.get("access_token")
-        user = request.GET.get("user_id")
-        if refresh(user, headers):
-            return function(request, *args, **kwargs)
-        else:
-            raise PermissionDenied
-
-    wrap.__doc__ = function.__doc__
-    wrap.__name__ = function.__name__
-    return wrap
 
 class Actions(Enum):
     advertisement = 'advertisement'
@@ -99,7 +51,7 @@ def parse_file_tree(tree):
     logging.debug("Given tree is type {}".format(type(tree)))
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
-@auth
+@wevolver_auth
 def create(request, user, project_name):
     """ Creates a bare repository with the provided name
 
@@ -121,7 +73,7 @@ def create(request, user, project_name):
     commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', precommit, [])
     return HttpResponse("Created at {}".format(path))
 
-@auth
+@wevolver_auth
 def delete(request, user, project_name):
     """ Deletes the repository with the provided name
 
@@ -137,7 +89,7 @@ def delete(request, user, project_name):
     shutil.rmtree(path)
     return HttpResponse("Deleted repository at {}".format(path))
 
-@auth
+@wevolver_auth
 def show_file(request, user, project_name, oid):
     """ Grabs and returns a single file from a user's repository
 
@@ -159,7 +111,7 @@ def show_file(request, user, project_name, oid):
         return JsonResponse(parse_file_tree(blob))
     return JsonResponse({'file': str(blob.data, 'utf-8')})
 
-@auth
+@wevolver_auth
 def list_files(request, user, project_name):
     """ Grabs and returns all files from a user's repository
 
@@ -175,7 +127,7 @@ def list_files(request, user, project_name):
     tree = repo.revparse_single('master').tree
     return JsonResponse(parse_file_tree(tree))
 
-@auth
+@wevolver_auth
 def list_repos(request, user):
     """ Grabs and returns all of a user's repository
 
