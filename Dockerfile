@@ -8,6 +8,9 @@ RUN cd libgit2-0.25.0 \
     && make \
     && make install
 
+RUN git clone https://github.com/btcrs/groot
+COPY . /git_code
+
 RUN pip install sphinx
 RUN pip install sphinx_rtd_theme
 
