@@ -1,5 +1,6 @@
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
+from functools import wraps
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from .decorators import git_access_required, auth, test
@@ -19,7 +20,6 @@ import os
 
 logger = logging.getLogger(__name__)
 
-<<<<<<< HEAD
 def base_auth(authorization_header):
     authmeth, auth = authorization_header.split(' ', 1)
     if authmeth.lower() == 'basic':
@@ -75,8 +75,6 @@ def poor_auth(function):
     wrap.__name__ = function.__name__
     return wrap
 
-=======
->>>>>>> 55e8454aa246ef2118bdd13f91c7b06e69c79cc3
 class Actions(Enum):
     advertisement = 'advertisement'
     result = 'result'
