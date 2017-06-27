@@ -30,7 +30,9 @@ ALLOWED_HOSTS = [ 'test.wevolver.com', 'test.wevolver.com:8000', 'http://localho
 # Application definition
 
 INSTALLED_APPS = (
+    'robots',
     'corsheaders',
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,6 +40,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 )
+
+SITE_ID = 1
 
 MIDDLEWARE_CLASSES = (
     'corsheaders.middleware.CorsMiddleware',
@@ -60,6 +64,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.loaders.app_directories.Loader',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
