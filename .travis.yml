@@ -6,10 +6,10 @@ services:
       - docker
 
 before_install:
-      - docker build -t btcrs/babygroot .
+      - docker build -t btcrs/groot .
 
 script:
-      - docker run --rm -p 8000:8000 -v `pwd`/app:/code -w /code btcrs/babygroot python manage.py test 
+      - docker run --rm -p 8000:8000 -v `pwd`/app:/code -w /code btcrs/groot python manage.py test 
 
 after_success:
       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
