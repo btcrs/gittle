@@ -14,7 +14,39 @@ import requests
 import shutil
 import json
 import os
+import base64
+from functools import wraps
+
 logger = logging.getLogger(__name__)
+
+def base_auth(authorization_header):
+    authmeth, auth = authorization_header.split(' ', 1)
+    if authmeth.lower() == 'basic':
+        auth = base64.b64decode(auth.strip()).decode('utf8')
+        username, password = auth.split(':', 1)
+        username = username
+        password = password
+        body = {'username': str(username), 'password': str(password), 'grant_type': 'password'}
+        url = "https://dev.wevolver.com/o/proxy-client-token"
+        response = requests.post(url, data=body)
+        return response
+    else:
+        return None
+
+def git_access_required(func):
+    @wraps(func)
+    def _decorator(request, *args, **kwargs):
+        if request.META.get('HTTP_AUTHORIZATION'):
+            user = base_auth(request.META['HTTP_AUTHORIZATION'])
+            if user:
+                return func(request, *args, **kwargs)
+            else:
+                return HttpResponseForbidden('Access forbidden.')
+         res = HttpResponse()
+         res.status_code = 401
+         res['WWW-Authenticate'] = 'Basic'
+         return res
+    return _decorator
 
 def refresh(client_id, client_secret, refresh_token):
     body = {'client_id': client_id,
@@ -148,7 +180,7 @@ def list_files(request, user, project_name):
     tree = repo.revparse_single('master').tree
     return JsonResponse(parse_file_tree(tree))
 
-@poor_auth
+@git_access_required
 def list_repos(request, user):
     """ Grabs and returns all of a user's repository
 
@@ -163,7 +195,7 @@ def list_repos(request, user):
     directories = [name for name in os.listdir(path)]
     return JsonResponse({'data': directories})
 
-@poor_auth
+@git_access_required
 def info_refs(request, user, project_name):
     """ Initiates a handshake for a smart HTTP connection
 
@@ -182,7 +214,7 @@ def info_refs(request, user, project_name):
                            repository=requested_repo, data=None)
     return response.get_http_info_refs()
 
-@poor_auth
+@git_access_required
 def service_rpc(request, user, project_name):
     """ Calls the Git commands to pull or push data from the server depending on the received service.
 
