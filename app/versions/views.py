@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.core.exceptions import PermissionDenied
 from functools import wraps
 import base64
+import tarfile
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from .git import GitResponse
@@ -188,6 +189,28 @@ def list_repos(request, user):
     path = os.path.join("./repos", user)
     directories = [name for name in os.listdir(path)]
     return JsonResponse({'data': directories})
+
+@auth
+def download_archive(request, user, project_name):
+    """ Grabs and returns all of a user's repository as a tarball
+
+    Args:
+        user (string): The user's name.
+        project_name (string): The user's repository name.
+
+    Returns:
+        JsonResponse: An object with the requested user's repository as a tarball
+    """
+
+    filename = project_name + '.tar'
+    response = HttpResponse(content_type='application/x-gzip')
+    response['Content-Disposition'] = 'attachment; filename=' + filename
+
+    with tarfile.open(fileobj=response, mode='w') as archive:
+        repo = pygit2.Repository(os.path.join("./repos", user, project_name))
+        repo.write_archive(repo.head.target, archive)
+
+    return response
 
 @git_access_required
 def info_refs(request, user, project_name):
