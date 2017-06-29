@@ -8,7 +8,8 @@ import shutil
 import json
 import os
 
-logging.disable(logging.NOTSET)
+logger = logging.getLogger(__name__)
+logging.disable(logging.CRITICAL)
 
 class VersionsViewsTestCase(TestCase):
 
