@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.core.exceptions import PermissionDenied
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
-from .decorators import git_access_required, wevolver_auth
+from .decorators import git_access_required, wevolver_auth, has_permission_to
 from .git import GitResponse
 from functools import wraps
 from urllib import parse
@@ -90,6 +90,7 @@ def create(request, user, project_name):
     return HttpResponse("Created at {}".format(path))
 
 @wevolver_auth
+@has_permission_to('write')
 def delete(request, user, project_name):
     """ Deletes the repository with the provided name
 
@@ -107,6 +108,7 @@ def delete(request, user, project_name):
     return HttpResponse("Deleted repository at {}".format(path))
 
 @wevolver_auth
+@has_permission_to('read')
 def show_file(request, user, project_name, oid):
     """ Grabs and returns a single file from a user's repository
 
@@ -130,6 +132,7 @@ def show_file(request, user, project_name, oid):
     return JsonResponse({'file': str(blob.data, 'utf-8')})
 
 @wevolver_auth
+@has_permission_to('read')
 def list_files(request, user, project_name):
     """ Grabs and returns all files from a user's repository
 
@@ -163,6 +166,7 @@ def list_repos(request, user):
     return JsonResponse({'data': directories})
 
 @wevolver_auth
+@has_permission_to('read')
 def download_archive(request, user, project_name):
     """ Grabs and returns all of a user's repository as a tarball
 
@@ -186,6 +190,7 @@ def download_archive(request, user, project_name):
     return response
 
 @git_access_required
+@has_permission_to('read')
 def info_refs(request, user, project_name):
     """ Initiates a handshake for a smart HTTP connection
 
@@ -206,6 +211,7 @@ def info_refs(request, user, project_name):
     return response.get_http_info_refs()
 
 @git_access_required
+@has_permission_to('write')
 def service_rpc(request, user, project_name):
     """ Calls the Git commands to pull or push data from the server depending on the received service.
 

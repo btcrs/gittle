@@ -7,9 +7,10 @@ import requests
 import logging
 
 logger = logging.getLogger(__name__)
+api_base_url = "https://dev.wevolver.com/api/2"
 
 def refresh(user, authorization):
-    url = "https://dev.wevolver.com/api/2/users/{}/checktoken/".format(user)
+    url = "{}/users/{}/checktoken/".format(api_base_url, user)
     headers = {'Authorization': 'Bearer {}'.format(authorization)}
     response = requests.get(url, headers=headers)
     return response.status_code == requests.codes.ok
@@ -41,3 +42,22 @@ def git_access_required(func):
         res['WWW-Authenticate'] = 'Basic'
         return res
     return _decorator
+
+def has_permission_to(permission):
+    def has_permission(func):
+        @wraps(func)
+        def _decorator(request, *args, **kwargs):
+            authorization = request.GET.get("access_token")
+            project_id = request.GET.get("project_id")
+            ##############################
+            project_id = 436
+            ##############################
+            url = "{}/projects/{}/permissions/".format(api_base_url, project_id)
+            headers = {'Authorization': 'Bearer {}'.format(authorization)}
+            response = requests.get(url, headers=headers)
+            if permission in response.text:
+                return func(request, *args, **kwargs)
+            else:
+                return HttpResponseForbidden('Access forbidden.')
+        return _decorator
+    return has_permission
