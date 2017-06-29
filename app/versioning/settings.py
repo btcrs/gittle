@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'ggec94x-e8!9pfqz2(ev32gxpq#w)81v4wa@cuc3tur77$s!1a'
 DEBUG = True
+<<<<<<< Updated upstream
 ALLOWED_HOSTS = [
                   'test.wevolver.com',
                   'test.wevolver.com:8000',
@@ -13,6 +14,14 @@ ALLOWED_HOSTS = [
                   '127.0.0.1',
                   '127.0.0.1:8000'
                  ]
+=======
+
+ALLOWED_HOSTS = [ 'test.wevolver.com', 'test.wevolver.com:8000', 'http://localhost:5000', 'localhost', '127.0.0.1', '127.0.0.1:8000' ]
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000
+
+# Application definition
+>>>>>>> Stashed changes
 
 INSTALLED_APPS = (
     'robots',

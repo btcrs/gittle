@@ -124,6 +124,7 @@ def show_file(request, user, project_name, oid):
         JsonResponse: An object with the requested file's data
     """
 
+
     directory = generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
@@ -168,6 +169,97 @@ def list_repos(request, user):
         directories = [name for name in os.listdir(path)] if os.path.exists(path) else []
     return JsonResponse({'data': directories})
 
+
+def write_file_to_index(repo, blob, path):
+    # read contents of index fil
+    index = repo.index
+    index.read()
+
+    # add blog as an entry to the index
+    entry = pygit2.IndexEntry(path, blob, GIT_FILEMODE_BLOB)
+    index.add(entry)
+
+    #  write index object to index file
+    index.write()
+
+    # generate new commit, the function takes a tree so we generate one from the new index file.
+    # TODO: Signature should be the real user's email.
+    signature = Signature('Tester', 'test@example.com', int(time()), 0)
+    commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', index.write_tree(), [repo.head.get_object().hex])
+
+
+
+@wevolver_auth
+@require_http_methods(["POST"])
+def create_new_folder(request, user, project_name):
+    """ Commits a single file to a specific path to create new folder in tree
+
+    Args:
+        user (string): The user's name.
+        project_name (string): The user's repository name.
+
+    Body:
+        File
+        path
+
+    Returns:
+        JsonResponse: An object
+    """
+    post = json.loads(request.body)
+    path = post['path'] + 'readme.md'
+    repo = pygit2.Repository(os.path.join("./repos", user, project_name))
+
+    blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
+    write_file_to_index(repo, blob, path)
+
+    return JsonResponse({'message': 'Folder Created'})
+
+@wevolver_auth
+@require_http_methods(["POST"])
+def upload_file(request, user, project_name):
+    """ Uploads and commits a single file to a specific path in a user's repository
+
+    Args:
+        user (string): The user's name.
+        project_name (string): The user's repository name.
+
+    Body:
+        File
+        path
+
+    Returns:
+        JsonResponse: An object
+    """
+    # path to upload location in repo.
+    path = request.POST['path'] + '/'
+
+    repo = pygit2.Repository(os.path.join("./repos", user, project_name))
+
+    if request.FILES['file']:
+        path = path + request.FILES['file'].name;
+
+        # create file blob from file or generate one if there are none to create empty folder
+        blob = repo.create_blob(request.FILES['file'].read())
+
+        write_file_to_index(repo, blob, path)
+        # # read contents of index fil
+        # index = repo.index
+        # index.read()
+
+        # # add blog as an entry to the index
+        # entry = pygit2.IndexEntry(path + request.FILES['file'].name, blob, GIT_FILEMODE_BLOB)
+        # index.add(entry)
+
+        # #  write index object to index file
+        # index.write()
+
+        # # generate new commit, the function takes a tree so we generate one from the new index file.
+        # # TODO: Signature should be the real user's email.
+        # signature = Signature('Tester', 'test@example.com', int(time()), 0)
+        # commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', index.write_tree(), [repo.head.get_object().hex])
+
+    return JsonResponse({'message': 'File uploaded'})
+
 @wevolver_auth
 @has_permission_to('read')
 def download_archive(request, user, project_name):
@@ -192,6 +284,7 @@ def download_archive(request, user, project_name):
 
     return response
 
+
 @git_access_required
 @has_permission_to('read')
 def info_refs(request, user, project_name):
@@ -212,6 +305,7 @@ def info_refs(request, user, project_name):
     response = GitResponse(service=request.GET['service'], action=Actions.advertisement.value,
                            repository=requested_repo, data=None)
     return response.get_http_info_refs()
+
 
 @git_access_required
 @has_permission_to('write')
