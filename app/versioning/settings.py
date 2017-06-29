@@ -74,6 +74,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 CORS_ORIGIN_ALLOW_ALL = True
+
+if not os.path.exists('logs/'):
+    os.makedirs('logs/')
+
+with open(os.path.join('logs', 'main_debug.log'), 'w'):
+    pass
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
