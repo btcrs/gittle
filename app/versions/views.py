@@ -232,7 +232,7 @@ def upload_file(request, user, project_name):
     """
     # path to upload location in repo.
     directory = generate_directory(user)
-    path = request.POST['path'] + '/'
+    path = request.POST['path']
 
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
 
