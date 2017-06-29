@@ -3,9 +3,12 @@ from django.test import TestCase
 from django.test import Client
 from versions.views import generate_directory
 from time import time
+import logging
 import shutil
 import json
 import os
+
+logging.disable(logging.NOTSET)
 
 class VersionsViewsTestCase(TestCase):
 
