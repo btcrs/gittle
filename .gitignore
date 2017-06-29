@@ -2,7 +2,7 @@ app/repos/*
 app/logs/*
 app/db.sqlite3
 **/.DS_Store
-*.pyc
+/*/*.pyc
 /test
 __pycache__
 dd.sqlite3
