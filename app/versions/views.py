@@ -76,8 +76,8 @@ def create(request, user, project_name):
     """
 
     directory = generate_directory(user)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    if not os.path.exists(os.path.join('./repos', directory)):
+        os.makedirs(os.path.join('./repos', directory))
 
     path = os.path.join("./repos", directory, project_name)
     repo = pygit2.init_repository(path, True)
