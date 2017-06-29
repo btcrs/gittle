@@ -131,7 +131,7 @@ def show_file(request, user, project_name, oid):
         blob = repo.get(oid)
         if type(blob) == pygit2.Tree:
             return JsonResponse(parse_file_tree(blob))
-    return JsonResponse({'file': str(blob.data, 'utf-8')})
+    return JsonResponse({'file': str(base64.b64encode(blob.data), 'utf-8')})
 
 @wevolver_auth
 @has_permission_to('read')
@@ -165,8 +165,7 @@ def list_repos(request, user):
 
     directory = generate_directory(user)
     path = os.path.join("./repos", directory)
-    if os.path.exists(path):
-        directories = [name for name in os.listdir(path)] if os.path.exists(path) else []
+    directories = [name for name in os.listdir(path)] if os.path.exists(path) else []
     return JsonResponse({'data': directories})
 
 
@@ -205,9 +204,10 @@ def create_new_folder(request, user, project_name):
     Returns:
         JsonResponse: An object
     """
+    directory = generate_directory(user)
     post = json.loads(request.body)
     path = post['path'] + 'readme.md'
-    repo = pygit2.Repository(os.path.join("./repos", user, project_name))
+    repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
 
     blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
     write_file_to_index(repo, blob, path)
@@ -231,9 +231,10 @@ def upload_file(request, user, project_name):
         JsonResponse: An object
     """
     # path to upload location in repo.
+    directory = generate_directory(user)
     path = request.POST['path'] + '/'
 
-    repo = pygit2.Repository(os.path.join("./repos", user, project_name))
+    repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
 
     if request.FILES['file']:
         path = path + request.FILES['file'].name;
