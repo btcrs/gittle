@@ -1,3 +1,4 @@
+from django.conf import settings
 import requests
 import base64
 
@@ -11,7 +12,7 @@ def basic_auth(authorization_header):
         body = {'username': str(username),
                 'password': str(password),
                 'grant_type': 'password'}
-        url = "https://dev.wevolver.com/o/proxy-client-token"
+        url = "{}/proxy-client-token".format(settings.AUTH_BASE)
         response = requests.post(url, data=body)
         return response
     else:

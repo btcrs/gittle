@@ -1,5 +1,5 @@
 app/repos/*
-app/logs
+app/logs/*
 app/db.sqlite3
 **/.DS_Store
 *.pyc
