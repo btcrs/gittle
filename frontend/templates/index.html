@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Versioning App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+</head>
+<body >
+    {% raw %}
+    <div class="ui container" ng-app="versioningApp">
+        <h1 class="ui header">
+          <img class="ui image" width="112px" src="static/images/logo.png" />
+          <div class="content">
+            Wevolver Version Control
+            <div class="sub header">Test application</div>
+          </div>
+        </h1>
+        <div ng-controller="LoginCtrl">
+            <div ng-hide="user" class="ui form">
+              <div class="fields">
+                <div class="field">
+                  <label>Email</label>
+                  <input type="text" placeholder="Email" name="email" ng-model="email">
+                </div>
+                <div class="field">
+                  <label>Password</label>
+                  <input type="password" placeholder="Password" name="password" ng-model="password">
+                </div>
+              </div>
+              <div>{{ ResponseDetails }}</div>
+              <button class="ui button" ng-click="submit()">Sign In</button>
+            </div>
+            <div ng-if="user">Signed in as: {{ user }}
+                <button class="ui button" ng-click="signout()">Sign Out</button>
+            </div>
+
+            <div ng-show="user">
+                <div class="ui divider"></div>
+                <h2 class="ui header">Repositories</h2>
+
+                <div class="ui form">
+                  <div class="fields">
+                    <div class="field">
+                      <label>Repo Name</label>
+                      <input type="text" placeholder="Name" name="repo_name" ng-model="repo_name">
+                    </div>
+                  </div>
+                  <div>{{ ResponseDetails }}</div>
+                  <button class="ui button" ng-click="createRepo()">Create Repo</button>
+                </div>
+            </div>
+
+            <div ng-if="repos.length !== 0" class="ui middle aligned selection list">
+                <table class="ui celled striped table">
+                    <tbody>
+                      <tr ng-repeat="value in repos">
+                        <td>
+                        <i class="cubes icon"></i>
+                          <a href="#" ng-click="selectRepo(value)">{{ value }}
+                          </a>
+                        </td>
+                        <td class="collapsing">
+                        <button class="mini ui button" ng-click="deleteRepo(value)"><i class="trash icon"></i> Delete</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="ui divider"></div>
+
+            <div style="padding-bottom: 1rem;" ng-show="selectedRepo">
+                <div class="ui labeled">
+                  <span class="ui basic label">
+                    {{baserUrl}}/rodrigo/{{selectedRepo}}
+                  </span>
+                </div>
+            </div>
+            <div style="padding-bottom: 1rem;">
+                <button ng-show="selectedRepo"  class="ui button" ng-click="downloadArchive(selectedRepo)">Download Project</button>
+            </div>
+            <div class="ui grid">
+                <div class="six wide column">
+                <div ng-show="tree">
+                    <input type="file" file-model="fileToUpload"/>
+                    <button class="ui button" ng-click = "uploadFile()">Upload File</button>
+                    <div class="ui form">
+                      <div class="fields">
+                        <div class="field">
+                          <label>Folder Name</label>
+                          <input type="text" placeholder="Folder name" name="folder_name" ng-model="folder_name">
+                        </div>
+                      </div>
+                      <button class="ui button" ng-click="createFolder()">Create Folder</button>
+                    </div>
+
+                    <table class="ui celled striped table">
+                        <tbody>
+                        <tr ng-show="treeIdPath.length > 0">
+                            <td class="collapsing">
+                            <a href="#" ng-click="getTree(prevTreeId, 'tree')"><- prev</a>
+                            </td>
+                        </tr>
+                        <tr  ng-repeat="value in tree">
+                            <td class="collapsing">
+                                <i ng-show="value.type !== 'tree'" style="color: #ccc" class="file icon"></i>
+                                <i ng-show="value.type === 'tree'" class="folder icon"></i>
+                                <a href="#" ng-click="getTree(value.oid, value.type, value.name)">{{ value.name }}</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+                <div class="ten wide column">
+                    <div ng-show="fileSrc" >
+                        <a href="{{fileAttachment}}" download="{{fileName}}">Download</a>
+                        <div class="ui teal segment">
+                            <div ng-show="fileType === 'text'">{{ fileSrc }}</div>
+                            <img ng-show="fileType === 'image'" src="{{fileSrc}}" width="100%">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endraw %}
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
+    <script src="static/js/angularapp.js"></script>
+    <script src="static/js/angular-utf8-base64.js"></script>
+</body>
+</html>
