@@ -15,5 +15,5 @@ after_success:
       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       - docker push btcrs/groot
 
- notifications:
-       slack: wevolver:xL4CGDEFEJ6qQeTHMFVk9tEe
+notifications:
+      slack: wevolver:xL4CGDEFEJ6qQeTHMFVk9tEe
