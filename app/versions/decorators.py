@@ -1,16 +1,16 @@
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.http import HttpResponseForbidden
+from django.conf import settings
 from functools import wraps
 from .auth import basic_auth
 import requests
 import logging
 
 logger = logging.getLogger(__name__)
-api_base_url = "https://dev.wevolver.com/api/2"
 
 def refresh(user, authorization):
-    url = "{}/users/{}/checktoken/".format(api_base_url, user)
+    url = "{}/users/{}/checktoken/".format(settings.API_BASE, user)
     headers = {'Authorization': 'Bearer {}'.format(authorization)}
     response = requests.get(url, headers=headers)
     return response.status_code == requests.codes.ok
@@ -52,7 +52,7 @@ def has_permission_to(permission):
             ##############################
             project_id = 436
             ##############################
-            url = "{}/projects/{}/permissions/".format(api_base_url, project_id)
+            url = "{}/projects/{}/permissions/".format(settings.API_BASE, project_id)
             headers = {'Authorization': 'Bearer {}'.format(authorization)}
             response = requests.get(url, headers=headers)
             if permission in response.text:

@@ -1,6 +1,7 @@
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, JsonResponse
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from .decorators import git_access_required, wevolver_auth, has_permission_to
@@ -30,12 +31,10 @@ class Actions(Enum):
 
 @require_http_methods(["POST"])
 def login(request):
-    logger.debug(request.body)
     post = json.loads(request.body)
     body = {'username': post['username'], 'password': post['password'], 'grant_type': 'password'}
-    url = "https://dev.wevolver.com/o/proxy-client-token"
+    url = "{}/proxy-client-token".format(settings.AUTH_BASE)
     response = requests.post(url, data=body)
-    logger.debug(response)
     return HttpResponse(response.text)
 
 def generate_directory(username):
@@ -87,7 +86,7 @@ def create(request, user, project_name):
     precommit = master.write()
     signature = Signature(user, '{}@example.com'.format(user), int(time()), 0)
     commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', precommit, [])
-    return HttpResponse("Created at {}".format(path))
+    return HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
 
 @wevolver_auth
 @has_permission_to('write')
@@ -103,8 +102,9 @@ def delete(request, user, project_name):
     """
 
     directory = generate_directory(user)
-    path = os.path.join("./repos", directory, project_name)
-    shutil.rmtree(path)
+    if os.path.exists(os.path.join('./repos', directory)):
+        path = os.path.join("./repos", directory, project_name)
+        shutil.rmtree(path)
     return HttpResponse("Deleted repository at {}".format(path))
 
 @wevolver_auth
@@ -125,10 +125,11 @@ def show_file(request, user, project_name, oid):
     """
 
     directory = generate_directory(user)
-    repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
-    blob = repo.get(oid)
-    if type(blob) == pygit2.Tree:
-        return JsonResponse(parse_file_tree(blob))
+    if os.path.exists(os.path.join('./repos', directory)):
+        repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
+        blob = repo.get(oid)
+        if type(blob) == pygit2.Tree:
+            return JsonResponse(parse_file_tree(blob))
     return JsonResponse({'file': str(blob.data, 'utf-8')})
 
 @wevolver_auth
@@ -145,8 +146,9 @@ def list_files(request, user, project_name):
     """
 
     directory = generate_directory(user)
-    repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-    tree = repo.revparse_single('master').tree
+    if os.path.exists(os.path.join('./repos', directory)):
+        repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
+        tree = repo.revparse_single('master').tree
     return JsonResponse(parse_file_tree(tree))
 
 @wevolver_auth
@@ -162,7 +164,8 @@ def list_repos(request, user):
 
     directory = generate_directory(user)
     path = os.path.join("./repos", directory)
-    directories = [name for name in os.listdir(path)] if os.path.exists(path) else []
+    if os.path.exists(path):
+        directories = [name for name in os.listdir(path)] if os.path.exists(path) else []
     return JsonResponse({'data': directories})
 
 @wevolver_auth
