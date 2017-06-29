@@ -35,6 +35,7 @@ def login(request):
     body = {'username': post['username'], 'password': post['password'], 'grant_type': 'password'}
     url = "{}/proxy-client-token".format(settings.AUTH_BASE)
     response = requests.post(url, data=body)
+    print(body)
     return HttpResponse(response.text)
 
 def generate_directory(username):
@@ -287,7 +288,7 @@ def download_archive(request, user, project_name):
 
 
 @git_access_required
-@has_permission_to('read')
+# @has_permission_to('read')
 def info_refs(request, user, project_name):
     """ Initiates a handshake for a smart HTTP connection
 
@@ -309,7 +310,7 @@ def info_refs(request, user, project_name):
 
 
 @git_access_required
-@has_permission_to('write')
+# @has_permission_to('write')
 def service_rpc(request, user, project_name):
     """ Calls the Git commands to pull or push data from the server depending on the received service.
 
