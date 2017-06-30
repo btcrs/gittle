@@ -1,6 +1,0 @@
-pygit2
-django
-django-cors-headers
-django-robots
-sphinx
-sphinx_rtd_theme
