@@ -21,6 +21,7 @@ def basic_auth(authorization_header):
                 'grant_type': 'password'}
         url = "{}/proxy-client-token".format(settings.AUTH_BASE)
         response = requests.post(url, data=body)
+        print(response.content)
         return response
     else:
         return None

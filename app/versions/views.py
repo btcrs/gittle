@@ -316,10 +316,19 @@ def info_refs(request, user, project_name):
                            repository=requested_repo, data=None)
     return response.get_http_info_refs()
 
+@git_access_required
+# @has_permission_to('read')
+def upload_pack(request, user, project_name):
+    """ Calls service_rpc assuming the user is authenicated and has read permissions """
+    return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
 @git_access_required
 # @has_permission_to('write')
-def service_rpc(request, user, project_name):
+def receive_pack(request, user, project_name):
+    """ Calls service_rpc assuming the user is authenicated and has write permissions """
+    return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
+
+def service_rpc(user, project_name, request_service, request_body):
     """ Calls the Git commands to pull or push data from the server depending on the received service.
 
     https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
@@ -334,6 +343,6 @@ def service_rpc(request, user, project_name):
 
     directory = generate_directory(user)
     requested_repo = os.path.join('./repos', directory, project_name)
-    response = GitResponse(service=request.path_info.split('/')[-1], action=Actions.result.value,
-                           repository=requested_repo, data=request.body)
+    response = GitResponse(service=request_service, action=Actions.result.value,
+                           repository=requested_repo, data=request_body)
     return response.get_http_service_rpc()
