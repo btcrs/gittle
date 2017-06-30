@@ -10,7 +10,7 @@ RUN cd libgit2-0.25.0 \
 
 RUN git clone https://github.com/btcrs/groot
 COPY . /git_code
-RUN pip install -r ./git_code/requirements.txt
+RUN pip3 install -r ./git_code/requirements.txt
 
 run ls
 RUN ldconfig
