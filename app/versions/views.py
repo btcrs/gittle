@@ -4,8 +4,8 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
-from .decorators import git_access_required, wevolver_auth, has_permission_to
-from .git import GitResponse
+from versions.decorators import git_access_required, wevolver_auth, has_permission_to
+from versions.git import GitResponse
 from functools import wraps
 from urllib import parse
 from time import time
@@ -31,16 +31,24 @@ class Actions(Enum):
 
 @require_http_methods(["POST"])
 def login(request):
+    """ Logs the user in and sets the token
+
+    Returns:
+        HttpResponse: An object containing all session metadata
+    """
     post = json.loads(request.body)
     body = {'username': post['username'], 'password': post['password'], 'grant_type': 'password'}
     url = "{}/proxy-client-token".format(settings.AUTH_BASE)
     response = requests.post(url, data=body)
-    print(body)
     return HttpResponse(response.text)
 
 def generate_directory(username):
-    """
+    """ Generates a unique directory structure for the project
+
     https://github.com/blog/117-scaling-lesson-23742
+
+    Returns:
+        Path (str): The unique path as a string
     """
     hash = hashlib.md5();
     hash.update(username.encode('utf-8'))
@@ -106,7 +114,7 @@ def delete(request, user, project_name):
     if os.path.exists(os.path.join('./repos', directory)):
         path = os.path.join("./repos", directory, project_name)
         shutil.rmtree(path)
-    return HttpResponse("Deleted repository at {}".format(path))
+    return HttpResponse("Deleted at ./repos/{}/{}".format(user, project_name))
 
 @wevolver_auth
 @has_permission_to('read')
@@ -336,10 +344,19 @@ def info_refs(request, user, project_name):
                            repository=requested_repo, data=None)
     return response.get_http_info_refs()
 
+@git_access_required
+# @has_permission_to('read')
+def upload_pack(request, user, project_name):
+    """ Calls service_rpc assuming the user is authenicated and has read permissions """
+    return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
 @git_access_required
 # @has_permission_to('write')
-def service_rpc(request, user, project_name):
+def receive_pack(request, user, project_name):
+    """ Calls service_rpc assuming the user is authenicated and has write permissions """
+    return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
+
+def service_rpc(user, project_name, request_service, request_body):
     """ Calls the Git commands to pull or push data from the server depending on the received service.
 
     https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
@@ -354,6 +371,6 @@ def service_rpc(request, user, project_name):
 
     directory = generate_directory(user)
     requested_repo = os.path.join('./repos', directory, project_name)
-    response = GitResponse(service=request.path_info.split('/')[-1], action=Actions.result.value,
-                           repository=requested_repo, data=request.body)
+    response = GitResponse(service=request_service, action=Actions.result.value,
+                           repository=requested_repo, data=request_body)
     return response.get_http_service_rpc()
