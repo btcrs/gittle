@@ -22,6 +22,19 @@ def get_http_error(exception):
         return HttpResponseNotFound()
 
 class GitResponse(HttpResponse):
+    """An extension of Django's HttpResponse that meets Git's smart HTTP specs
+
+    The responses to Git's requests must follow a protocol, and this class is
+    meant to build properly formed responses.
+
+    Attributes:
+        service (str): the initiated git plumbing command
+        action (str): the action initiated by the service
+        repository (str): target repository of the request
+        data (str): uploaded data
+
+    """
+
     def __init__(self, *args, **kwargs):
         self.service = Services(kwargs.pop('service', None))
         self.action = kwargs.pop('action', None)

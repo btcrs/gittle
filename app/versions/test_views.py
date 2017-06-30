@@ -1,4 +1,4 @@
-from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
+from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature, IndexEntry
 from django.test import TestCase
 from django.test import Client
 from versions.views import generate_directory
@@ -15,7 +15,7 @@ logging.disable(logging.CRITICAL)
 class VersionsViewsTestCase(TestCase):
 
     @classmethod
-    def setUpClass(cls):
+    def setUpTestData(cls):
         login_client = Client()
         login_data = {
             'username': 'rodrigo@wevolver.com',
@@ -58,6 +58,14 @@ class VersionsViewsTestCase(TestCase):
         self.assertTrue(self.app in json.loads(response.content)['data'])
 
     def test_add_files(self):
+        """
+        c = Client()
+        with open('wishlist.doc') as fp:
+            c.post('/customers/wishes/', {'name': 'fred', 'attachment': fp})
+        """
+        pass
+
+    def test_commit(self):
         pass
 
     def test_list_files(self):

@@ -10,12 +10,24 @@ import logging
 logger = logging.getLogger(__name__)
 
 def refresh(user, authorization):
+    """ Checks against the Wevolver API to see if the users token is currently valid
+
+    Args:
+        authorization (str): the current user's bearer token
+        user (str): the current requesting user's id
+    """
     url = "{}/users/{}/checktoken/".format(settings.API_BASE, user)
     headers = {'Authorization': 'Bearer {}'.format(authorization)}
     response = requests.get(url, headers=headers)
     return response.status_code == requests.codes.ok
 
 def wevolver_auth(function):
+    """ Determines the user and authorization through Wevolver token based auth
+
+    Uses the request's access_token and user_id params to check the user's bearer
+    token against the Wevolver API
+    """
+
     def wrap(request, *args, **kwargs):
         headers = request.GET.get("access_token")
         user = request.GET.get("user_id")
@@ -29,6 +41,11 @@ def wevolver_auth(function):
     return wrap
 
 def git_access_required(func):
+    """ Determines the user and authorization through basic http auth
+
+    Uses the requests HTTP_AUTHORIZATION to authorize the user against
+    basic HTTP auth
+    """
     @wraps(func)
     def _decorator(request, *args, **kwargs):
         if request.META.get('HTTP_AUTHORIZATION'):
@@ -44,6 +61,15 @@ def git_access_required(func):
     return _decorator
 
 def has_permission_to(permission):
+    """ Checks user's permission set for the requested project
+
+    Calls the project permission endpoint with the current user's id to
+    get a list of permissions based on their role
+
+    ####################
+         UNFINISHED
+    ####################
+    """
     def has_permission(func):
         @wraps(func)
         def _decorator(request, *args, **kwargs):

@@ -3,6 +3,13 @@ import requests
 import base64
 
 def basic_auth(authorization_header):
+    """ Basic auth middleware for git requests
+
+    Attempts to log the current user into the Wevolver API login endpoint
+
+    Args:
+        authorization_header (str): the current user's bearer token
+    """
     authmeth, auth = authorization_header.split(' ', 1)
     if authmeth.lower() == 'basic':
         auth = base64.b64decode(auth.strip()).decode('utf8')
