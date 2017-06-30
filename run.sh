@@ -10,6 +10,8 @@ docker build -t ${CONTAINER_NAME} .
 
 if [[ ${command} == makedocs ]]; then
   docker run --rm -d --name=${CONTAINER_NAME} -p 8000:8000 -v `pwd`:/code -w /code/docs ${CONTAINER_NAME} make html
+  git add -A
+  git commit -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
 elif [[ ${command} == run ]]; then
   docker run --rm -it --name=${CONTAINER_NAME} -p 8000:8000 -v `pwd`/app:/code -w /code ${CONTAINER_NAME} python manage.py ${runner}
 elif [[ ${command} == runserver ]]; then
