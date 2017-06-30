@@ -286,9 +286,9 @@ verApp.controller('LoginCtrl',
             + '&user_id=' + localStorage.getItem("user_id")
         }   
         $scope.createFolder = function() {
-            $scope.currentTreePath.push($scope.folder_name);
-            var path = $scope.currentTreePath.join('/') + '/';
-            $scope.currentTreePath.pop();
+            var path = $scope.currentTreePath;//.push($scope.folder_name);
+            //$scope.currentTreePath.pop();
+            path.push($scope.folder_name)
 
             console.log(path)
             var req = {
@@ -300,13 +300,17 @@ verApp.controller('LoginCtrl',
                 },
                 data: {path: path},
             }
-            // if($scope.folder_name) $http(req)
+            if($scope.folder_name) {
+                $http(req)
+                .then(function() {
+                    path.pop()
+                })
+            }
         }
+
         $scope.uploadFile = function(){
            var file = $scope.fileToUpload;
-           var path = '';
-           if($scope.currentTreePath.length > 0) path = $scope.currentTreePath.join('/') + '/';
-           console.log(file);
+           var path = $scope.currentTreePath;
            var uploadUrl = baserUrl + '/rodrigo/' + $scope.selectedRepo + '/upload?access_token=' + localStorage.getItem("access_token")
             + '&user_id=' + localStorage.getItem("user_id");
            fileUpload.uploadFileToUrl(file, uploadUrl, path);

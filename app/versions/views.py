@@ -170,22 +170,80 @@ def list_repos(request, user):
     return JsonResponse({'data': directories})
 
 
-def write_file_to_index(repo, blob, path):
-    # read contents of index fil
-    index = repo.index
-    index.read()
+def add_blob_to_tree(oldTree, repo, blob, path, name):
+    # path is an array
+    print(path)
+    # treeBldOld = repo.TreeBuilder(oldTree)
 
-    # add blog as an entry to the index
-    entry = pygit2.IndexEntry(path, blob, GIT_FILEMODE_BLOB)
-    index.add(entry)
 
-    #  write index object to index file
-    index.write()
+    # treeBld = repo.TreeBuilder()
+    # treeBld.insert(name, blob, GIT_FILEMODE_BLOB)
 
-    # generate new commit, the function takes a tree so we generate one from the new index file.
-    # TODO: Signature should be the real user's email.
-    signature = Signature('Tester', 'test@example.com', int(time()), 0)
-    commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', index.write_tree(), [repo.head.get_object().hex])
+    # treeBldToInsert = treeBld;
+    latestTree = oldTree
+
+    fObj = None
+    trees = []
+
+    if path[0] != '':
+        for location in path:
+            try:
+                fObj = latestTree.__getitem__(location)
+                latestTree = repo.get(fObj.id)
+            except:
+                latestTree = False
+            trees.append(latestTree)
+        print(trees)
+        if trees[len(trees) - 1]:
+            latestTreeB = repo.TreeBuilder(trees[len(trees) - 1])
+        else:
+            latestTreeB = repo.TreeBuilder()
+        latestTreeB.insert(name, blob, GIT_FILEMODE_BLOB)
+
+        for index in range(len(path) - 1, 0, -1):
+            previousTreeB = latestTreeB
+            if trees[index - 1]:
+                latestTreeB = repo.TreeBuilder(trees[index - 1])
+            else:
+                latestTreeB = repo.TreeBuilder()
+            latestTreeB.insert(path[index], previousTreeB.write(), GIT_FILEMODE_TREE)
+
+        OldTreeB = repo.TreeBuilder(oldTree)
+        OldTreeB.insert(path[0], latestTreeB.write(), GIT_FILEMODE_TREE)
+
+        return OldTreeB.write()
+    else:
+        OldTreeB = repo.TreeBuilder(oldTree)
+        OldTreeB.insert(name, blob, GIT_FILEMODE_BLOB)
+
+        return OldTreeB.write()
+
+
+def commit_blob(repo, blob, path, name='readme.md'):
+
+    oldTree = repo.revparse_single('master').tree
+
+    newTree = add_blob_to_tree(oldTree, repo, blob, path.split(','), name)
+    # treeBld.insert('rand', treeBldNew.write(), GIT_FILEMODE_TREE)
+
+    # newTree = treeBld.write()
+    
+    if newTree:
+        # read contents of index file
+        index = repo.index
+        index.read()
+
+        # add blog as an entry to the index
+        entry = pygit2.IndexEntry(path + name, blob, GIT_FILEMODE_BLOB)
+        index.add(entry)
+
+        #  write index object to index file
+        index.write()
+
+        # generate new commit, the function takes a tree so we generate one from the new index file.
+        # TODO: Signature should be the real user's email.
+        signature = Signature('Tester', 'test@example.com', int(time()), 0)
+        commit = repo.create_commit(repo.head.name, signature, signature, 'Test commit with pygit2', newTree, [repo.head.peel().id])
 
 
 
@@ -207,11 +265,12 @@ def create_new_folder(request, user, project_name):
     """
     directory = generate_directory(user)
     post = json.loads(request.body)
-    path = post['path'] + 'readme.md'
+    path = ','.join(post['path'])
+    print(path)
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
 
     blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
-    write_file_to_index(repo, blob, path)
+    commit_blob(repo, blob, path, 'readme.md')
 
     return JsonResponse({'message': 'Folder Created'})
 
@@ -238,27 +297,12 @@ def upload_file(request, user, project_name):
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
 
     if request.FILES['file']:
-        path = path + request.FILES['file'].name;
-
+        # path = path + request.FILES['file'].name;
+        name = request.FILES['file'].name
         # create file blob from file or generate one if there are none to create empty folder
         blob = repo.create_blob(request.FILES['file'].read())
 
-        write_file_to_index(repo, blob, path)
-        # # read contents of index fil
-        # index = repo.index
-        # index.read()
-
-        # # add blog as an entry to the index
-        # entry = pygit2.IndexEntry(path + request.FILES['file'].name, blob, GIT_FILEMODE_BLOB)
-        # index.add(entry)
-
-        # #  write index object to index file
-        # index.write()
-
-        # # generate new commit, the function takes a tree so we generate one from the new index file.
-        # # TODO: Signature should be the real user's email.
-        # signature = Signature('Tester', 'test@example.com', int(time()), 0)
-        # commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', index.write_tree(), [repo.head.get_object().hex])
+        commit_blob(repo, blob, path, name)
 
     return JsonResponse({'message': 'File uploaded'})
 
