@@ -12,8 +12,8 @@ script:
       - docker run --rm -p 8000:8000 -v `pwd`/app:/code -w /code btcrs/groot python manage.py test 
 
 after_success:
-      - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-      - docker push btcrs/groot
+      - test $TRAVIS_BRANCH = "master" && docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+      - test $TRAVIS_BRANCH = "master" && docker push btcrs/groot
 
 notifications:
   slack: wevolver:xL4CGDEFEJ6qQeTHMFVk9tEe

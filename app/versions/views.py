@@ -170,64 +170,48 @@ def list_repos(request, user):
     return JsonResponse({'data': directories})
 
 
-def add_blob_to_tree(oldTree, repo, blob, path, name):
-    # path is an array
-    print(path)
-    # treeBldOld = repo.TreeBuilder(oldTree)
+def add_blob_to_tree(previous_commit_tree, repo, blob, path, name):
 
-
-    # treeBld = repo.TreeBuilder()
-    # treeBld.insert(name, blob, GIT_FILEMODE_BLOB)
-
-    # treeBldToInsert = treeBld;
-    latestTree = oldTree
-
-    fObj = None
+    current_tree = previous_commit_tree
     trees = []
 
     if path[0] != '':
         for location in path:
             try:
-                fObj = latestTree.__getitem__(location)
-                latestTree = repo.get(fObj.id)
+                next_tree_entry = current_tree.__getitem__(location)
+                current_tree = repo.get(next_tree_entry.id)
             except:
-                latestTree = False
-            trees.append(latestTree)
-        print(trees)
-        if trees[len(trees) - 1]:
-            latestTreeB = repo.TreeBuilder(trees[len(trees) - 1])
-        else:
-            latestTreeB = repo.TreeBuilder()
-        latestTreeB.insert(name, blob, GIT_FILEMODE_BLOB)
+                current_tree = False
+            trees.append(current_tree)
+
+        is_tree = trees[-1]
+        current_tree_builder = repo.TreeBuilder(trees[-1]) if is_tree else repo.TreeBuilder()
+        current_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
 
         for index in range(len(path) - 1, 0, -1):
-            previousTreeB = latestTreeB
-            if trees[index - 1]:
-                latestTreeB = repo.TreeBuilder(trees[index - 1])
-            else:
-                latestTreeB = repo.TreeBuilder()
-            latestTreeB.insert(path[index], previousTreeB.write(), GIT_FILEMODE_TREE)
+            previous_tree_builder = current_tree_builder
+            is_tree = trees[index - 1]
+            current_tree_builder = repo.TreeBuilder(is_tree) if is_tree else repo.TreeBuilder()
+            current_tree_builder.insert(path[index], previous_tree_builder.write(), GIT_FILEMODE_TREE)
 
-        OldTreeB = repo.TreeBuilder(oldTree)
-        OldTreeB.insert(path[0], latestTreeB.write(), GIT_FILEMODE_TREE)
-
-        return OldTreeB.write()
+        previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
+        previous_commit_tree_builder.insert(path[0], current_tree_builder.write(), GIT_FILEMODE_TREE)
+        return previous_commit_tree_builder.write()
     else:
-        OldTreeB = repo.TreeBuilder(oldTree)
-        OldTreeB.insert(name, blob, GIT_FILEMODE_BLOB)
-
-        return OldTreeB.write()
+        previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
+        previous_commit_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
+        return previous_commit_tree_builder.write()
 
 
 def commit_blob(repo, blob, path, name='readme.md'):
 
-    oldTree = repo.revparse_single('master').tree
+    previous_commit_tree = repo.revparse_single('master').tree
 
-    newTree = add_blob_to_tree(oldTree, repo, blob, path.split(','), name)
+    newTree = add_blob_to_tree(previous_commit_tree, repo, blob, path.split(','), name)
     # treeBld.insert('rand', treeBldNew.write(), GIT_FILEMODE_TREE)
 
     # newTree = treeBld.write()
-    
+
     if newTree:
         # read contents of index file
         index = repo.index
