@@ -17,6 +17,8 @@ elif [[ ${command} == run ]]; then
   docker run --rm -it --name=${CONTAINER_NAME} -p 8000:8000 -v `pwd`/app:/code -w /code ${CONTAINER_NAME} python manage.py ${runner} ${params}
 elif [[ ${command} == runserver ]]; then
   docker run --rm -it --name=${CONTAINER_NAME} -p 8000:8000 -v `pwd`/app:/code -w /code ${CONTAINER_NAME} python manage.py runserver [::]:8000
+elif [[ ${command} == coverage ]]; then
+  docker run --rm -it --name=${CONTAINER_NAME} -p 8000:8000 -v `pwd`/app:/code -w /code ${CONTAINER_NAME} coverage run ./manage.py test
 else
   docker run --rm -it --name=${CONTAINER_NAME} -p 8000:8000 -v `pwd`/app:/code -w /git_code/app ${CONTAINER_NAME} python manage.py runserver [::]:8000
 fi
