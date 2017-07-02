@@ -7,11 +7,14 @@ services:
 
 before_install:
       - docker build -t btcrs/groot .
+      - pip install coverage
 
 script:
       - docker run --rm -p 8000:8000 -v `pwd`/app:/code -w /code btcrs/groot python manage.py test 
+      - docker run --rm -p 8000:8000 -v `pwd`/app:/code -w /code btcrs/groot coverage run --source=coverage ./manage.py test
 
 after_success:
+      - coveralls
       - test $TRAVIS_BRANCH = "master" && docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       - test $TRAVIS_BRANCH = "master" && docker push btcrs/groot
 
