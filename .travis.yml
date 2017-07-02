@@ -10,11 +10,11 @@ before_install:
       - pip install coverage
 
 script:
-      - docker run --rm -p 8000:8000 -v `pwd`/app:/code -w /code btcrs/groot python manage.py test 
-      - docker run --rm -p 8000:8000 -v `pwd`/app:/code -w /code btcrs/groot coverage run --source=coverage ./manage.py test
+      - docker run --rm -p 8000:8000 -v `pwd`/app:/app -w /app btcrs/groot python manage.py test 
+      - docker run --rm -p 8000:8000 -v `pwd`/app:/app -w /app btcrs/groot coverage run --source=coverage ./manage.py test
 
 after_success:
-      - coveralls
+      - cd ./app && coveralls && cd ..
       - test $TRAVIS_BRANCH = "master" && docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       - test $TRAVIS_BRANCH = "master" && docker push btcrs/groot
 
