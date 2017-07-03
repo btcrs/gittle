@@ -72,7 +72,7 @@ def parse_file_tree(tree):
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
 @wevolver_auth
-def create(request, user, project_name):
+def create(request, user, project_name, access_token):
     """ Creates a bare repository with the provided name
 
     Args:
@@ -89,17 +89,26 @@ def create(request, user, project_name):
 
     path = os.path.join("./repos", directory, project_name)
     repo = pygit2.init_repository(path, True)
-    readme = repo.create_blob('#Hello, World!')
-    master = repo.TreeBuilder()
-    master.insert('readme.md', readme, GIT_FILEMODE_BLOB)
-    precommit = master.write()
-    signature = Signature(user, '{}@example.com'.format(user), int(time()), 0)
-    commit = repo.create_commit('refs/heads/master', signature, signature, 'Test commit with pygit2', precommit, [])
+
+    message = "Initial Commit - Automated"
+    comitter = pygit2.Signature('Wevolver', 'Wevolver')
+    parents = []
+
+    index = repo.index
+    index.read()
+    tree = index.write_tree()
+
+    sha = repo.create_commit('HEAD',
+                             comitter, comitter, message,
+                             tree, [])
+
+    blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
+    commit_blob(repo, blob, 'readme.md')
     return HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
 
 @wevolver_auth
 @has_permission_to('write')
-def delete(request, user, project_name):
+def delete(request, user, project_name, access_token):
     """ Deletes the repository with the provided name
 
     Args:
@@ -118,7 +127,7 @@ def delete(request, user, project_name):
 
 @wevolver_auth
 @has_permission_to('read')
-def show_file(request, user, project_name, oid):
+def show_file(request, user, project_name, oid, access_token):
     """ Grabs and returns a single file from a user's repository
 
     if the requested object is a tree the function parses it intstead
@@ -140,11 +149,13 @@ def show_file(request, user, project_name, oid):
         blob = repo.get(oid)
         if type(blob) == pygit2.Tree:
             return JsonResponse(parse_file_tree(blob))
-    return JsonResponse({'file': str(base64.b64encode(blob.data), 'utf-8')})
+        else:
+            return JsonResponse({'file': str(base64.b64encode(blob.data), 'utf-8')})
+    return JsonResponse({'file': 'None'})
 
 @wevolver_auth
 @has_permission_to('read')
-def list_files(request, user, project_name):
+def list_files(request, user, project_name, access_token):
     """ Grabs and returns all files from a user's repository
 
     Args:
@@ -162,7 +173,7 @@ def list_files(request, user, project_name):
     return JsonResponse(parse_file_tree(tree))
 
 @wevolver_auth
-def list_repos(request, user):
+def list_repos(request, user, access_token):
     """ Grabs and returns all of a user's repository
 
     Args:
@@ -179,7 +190,6 @@ def list_repos(request, user):
 
 
 def add_blob_to_tree(previous_commit_tree, repo, blob, path, name):
-
     current_tree = previous_commit_tree
     trees = []
 
@@ -210,26 +220,14 @@ def add_blob_to_tree(previous_commit_tree, repo, blob, path, name):
         previous_commit_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
         return previous_commit_tree_builder.write()
 
-
 def commit_blob(repo, blob, path, name='readme.md'):
-
     previous_commit_tree = repo.revparse_single('master').tree
-
     newTree = add_blob_to_tree(previous_commit_tree, repo, blob, path.split(','), name)
-    # treeBld.insert('rand', treeBldNew.write(), GIT_FILEMODE_TREE)
-
-    # newTree = treeBld.write()
-
     if newTree:
-        # read contents of index file
         index = repo.index
         index.read()
-
-        # add blog as an entry to the index
         entry = pygit2.IndexEntry(path + name, blob, GIT_FILEMODE_BLOB)
         index.add(entry)
-
-        #  write index object to index file
         index.write()
 
         # generate new commit, the function takes a tree so we generate one from the new index file.
@@ -238,10 +236,9 @@ def commit_blob(repo, blob, path, name='readme.md'):
         commit = repo.create_commit(repo.head.name, signature, signature, 'Test commit with pygit2', newTree, [repo.head.peel().id])
 
 
-
 @wevolver_auth
 @require_http_methods(["POST"])
-def create_new_folder(request, user, project_name):
+def create_new_folder(request, user, project_name, access_token):
     """ Commits a single file to a specific path to create new folder in tree
 
     Args:
@@ -258,17 +255,14 @@ def create_new_folder(request, user, project_name):
     directory = generate_directory(user)
     post = json.loads(request.body)
     path = ','.join(post['path'])
-    print(path)
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-
     blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
     commit_blob(repo, blob, path, 'readme.md')
-
     return JsonResponse({'message': 'Folder Created'})
 
 @wevolver_auth
 @require_http_methods(["POST"])
-def upload_file(request, user, project_name):
+def upload_file(request, user, project_name, access_token):
     """ Uploads and commits a single file to a specific path in a user's repository
 
     Args:
@@ -282,25 +276,20 @@ def upload_file(request, user, project_name):
     Returns:
         JsonResponse: An object
     """
-    # path to upload location in repo.
     directory = generate_directory(user)
     path = request.POST['path']
-
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
 
     if request.FILES['file']:
-        # path = path + request.FILES['file'].name;
         name = request.FILES['file'].name
-        # create file blob from file or generate one if there are none to create empty folder
         blob = repo.create_blob(request.FILES['file'].read())
-
         commit_blob(repo, blob, path, name)
 
     return JsonResponse({'message': 'File uploaded'})
 
 @wevolver_auth
 @has_permission_to('read')
-def download_archive(request, user, project_name):
+def download_archive(request, user, project_name, access_token):
     """ Grabs and returns all of a user's repository as a tarball
 
     Args:
@@ -324,8 +313,8 @@ def download_archive(request, user, project_name):
 
 
 @git_access_required
-# @has_permission_to('read')
-def info_refs(request, user, project_name):
+@has_permission_to('read')
+def info_refs(request, user, project_name, access_token):
     """ Initiates a handshake for a smart HTTP connection
 
     https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
@@ -345,14 +334,14 @@ def info_refs(request, user, project_name):
     return response.get_http_info_refs()
 
 @git_access_required
-# @has_permission_to('read')
-def upload_pack(request, user, project_name):
+@has_permission_to('read')
+def upload_pack(request, user, project_name, access_token):
     """ Calls service_rpc assuming the user is authenicated and has read permissions """
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
 @git_access_required
-# @has_permission_to('write')
-def receive_pack(request, user, project_name):
+@has_permission_to('write')
+def receive_pack(request, user, project_name, access_token):
     """ Calls service_rpc assuming the user is authenicated and has write permissions """
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
