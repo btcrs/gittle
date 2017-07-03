@@ -10,8 +10,10 @@ before_install:
 
 script:
       - docker run --rm -p 8000:8000 -v `pwd`/app:/code -w /code btcrs/groot python manage.py test 
+      - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code btcrs/groot /bin/sh -c 'cd ./app && coverage run --source=./ manage.py test'
 
 after_success:
+      - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code -e COVERALLS_REPO_TOKEN=$COVERALLS btcrs/groot /bin/sh -c 'cd ./app && coveralls'
       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
       - docker push btcrs/groot
 

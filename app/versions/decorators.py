@@ -6,6 +6,7 @@ from functools import wraps
 import requests
 import logging
 import base64
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +29,7 @@ def basic_auth(authorization_header):
                 'grant_type': 'password'}
         url = "{}/proxy-client-token".format(settings.AUTH_BASE)
         response = requests.post(url, data=body)
-        print(response.content)
-        return response
+        return json.loads(response.content)['access_token']
     else:
         return None
 
@@ -54,6 +54,7 @@ def wevolver_auth(function):
 
     def wrap(request, *args, **kwargs):
         headers = request.GET.get("access_token")
+        kwargs['access_token'] = headers
         user = request.GET.get("user_id")
         if refresh(user, headers):
             return function(request, *args, **kwargs)
@@ -75,6 +76,7 @@ def git_access_required(func):
         if request.META.get('HTTP_AUTHORIZATION'):
             user = basic_auth(request.META['HTTP_AUTHORIZATION'])
             if user:
+                kwargs['access_token'] = user
                 return func(request, *args, **kwargs)
             else:
                 return HttpResponseForbidden('Access forbidden.')
@@ -89,18 +91,18 @@ def has_permission_to(permission):
 
     Calls the project permission endpoint with the current user's id to
     get a list of permissions based on their role
-
-    ####################
+#######################################################################################
          UNFINISHED
-    ####################
+    Needs to get the project id in order to check the permssions on a per project basis
+#######################################################################################
     """
     def has_permission(func):
         @wraps(func)
         def _decorator(request, *args, **kwargs):
-            authorization = request.GET.get("access_token")
+            authorization = kwargs['access_token']
             project_id = request.GET.get("project_id")
             ##############################
-            project_id = 436
+            project_id = 4
             ##############################
             url = "{}/projects/{}/permissions/".format(settings.API_BASE, project_id)
             headers = {'Authorization': 'Bearer {}'.format(authorization)}
