@@ -1,4 +1,7 @@
-# groot
+# groot 
+
+[![Coverage Status](https://coveralls.io/repos/github/btcrs/groot/badge.svg?branch=upload-testing)](https://coveralls.io/github/btcrs/groot?branch=master) [![Build Status](https://travis-ci.org/btcrs/groot.svg?branch=master)](https://travis-ci.org/btcrs/groot)
+
 
 > A git server
 
