@@ -125,9 +125,24 @@ def delete(request, user, project_name, access_token):
         shutil.rmtree(path)
     return HttpResponse("Deleted at ./repos/{}/{}".format(user, project_name))
 
+def walk_tree(repo, full_path):
+    locations = full_path.split('/')
+    if locations[0] == "":
+        locations = []
+    current_tree = repo.revparse_single('master').tree
+    print(locations)
+    for location in locations:
+        # try:
+        next_tree_entry = current_tree.__getitem__(location)
+        current_tree = repo.get(next_tree_entry.id)
+        # except:
+            # return current_tree
+    return current_tree
+
+
 @wevolver_auth
 @has_permission_to('read')
-def show_file(request, user, project_name, oid, access_token):
+def show_file(request, user, project_name, access_token):
     """ Grabs and returns a single file from a user's repository
 
     if the requested object is a tree the function parses it intstead
@@ -141,21 +156,21 @@ def show_file(request, user, project_name, oid, access_token):
     Returns:
         JsonResponse: An object with the requested file's data
     """
-
+    path = request.GET.get('path').rstrip('/')
 
     directory = generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
-        blob = repo.get(oid)
-        if type(blob) == pygit2.Tree:
-            return JsonResponse(parse_file_tree(blob))
+        git_object = walk_tree(repo, path)
+        if type(git_object) == pygit2.Tree:
+            return JsonResponse(parse_file_tree(git_object))
         else:
-            return JsonResponse({'file': str(base64.b64encode(blob.data), 'utf-8')})
+            return JsonResponse({'file': str(base64.b64encode(git_object.data), 'utf-8')})
     return JsonResponse({'file': 'None'})
 
-@wevolver_auth
-@has_permission_to('read')
-def list_files(request, user, project_name, access_token):
+# @wevolver_auth
+# @has_permission_to('read')
+# def list_files(request, user, project_name, access_token):
     """ Grabs and returns all files from a user's repository
 
     Args:
@@ -166,11 +181,11 @@ def list_files(request, user, project_name, access_token):
         JsonResponse: An object with the requested repository's files
     """
 
-    directory = generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory)):
-        repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-        tree = repo.revparse_single('master').tree
-    return JsonResponse(parse_file_tree(tree))
+    # directory = generate_directory(user)
+    # if os.path.exists(os.path.join('./repos', directory)):
+    #     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
+    #     tree = repo.revparse_single('master').tree
+    # return JsonResponse(parse_file_tree(tree))
 
 @wevolver_auth
 def list_repos(request, user, access_token):

@@ -1,16 +1,4 @@
 //
-function dataURIToBlob(dataURI, callback) {
-  var binStr = atob(dataURI.split(',')[1]),
-    len = binStr.length,
-    arr = new Uint8Array(len);
-
-  for (var i = 0; i < len; i++) {
-    arr[i] = binStr.charCodeAt(i);
-  }
-
-  callback(new Blob([arr]));
-}
-
 function b64toBlob(b64Data, contentType, sliceSize) {
   contentType = contentType || '';
   sliceSize = sliceSize || 512;
