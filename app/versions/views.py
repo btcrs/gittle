@@ -1,8 +1,3 @@
-from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
-from django.core.exceptions import PermissionDenied
-from django.conf import settings
-
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from versions.decorators import git_access_required, wevolver_auth, has_permission_to
 from versions.git import GitResponse
@@ -10,6 +5,11 @@ from functools import wraps
 from urllib import parse
 from time import time
 from enum import Enum
+
+from django.views.decorators.http import require_http_methods
+from django.http import HttpResponse, JsonResponse
+from django.core.exceptions import PermissionDenied
+from django.conf import settings
 
 import requests
 import logging
@@ -171,23 +171,6 @@ def list_files(request, user, project_name, access_token):
         repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
         tree = repo.revparse_single('master').tree
     return JsonResponse(parse_file_tree(tree))
-
-@wevolver_auth
-def list_repos(request, user, access_token):
-    """ Grabs and returns all of a user's repository
-
-    Args:
-        user (string): The user's name.
-
-    Returns:
-        JsonResponse: An object with the requested user's repositories
-    """
-
-    directory = generate_directory(user)
-    path = os.path.join("./repos", directory)
-    directories = [name for name in os.listdir(path)] if os.path.exists(path) else []
-    return JsonResponse({'data': directories})
-
 
 def add_blob_to_tree(previous_commit_tree, repo, blob, path, name):
     current_tree = previous_commit_tree

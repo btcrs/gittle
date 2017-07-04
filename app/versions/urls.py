@@ -13,5 +13,4 @@ urlpatterns = [
     url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/info/refs$', views.info_refs, name='info-refs'),
     url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/(?P<oid>[-.\w]+)$', views.show_file, name='show-file'),
     url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)$', views.list_files, name='list-files'),
-    url(r'^(?P<user>[-.\w]+)$', views.list_repos, name='list-repos'),
 ]
