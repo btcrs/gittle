@@ -129,19 +129,24 @@ def walk_tree(repo, full_path):
     locations = full_path.split('/')
     if locations[0] == "":
         locations = []
-    current_tree = repo.revparse_single('master').tree
+    current_object = repo.revparse_single('master').tree
     print(locations)
+    blob = None
     for location in locations:
         # try:
-        next_tree_entry = current_tree.__getitem__(location)
-        current_tree = repo.get(next_tree_entry.id)
+        next_object = current_object.__getitem__(location)
+        temp_object = current_object
+        current_object = repo.get(next_object.id)
+        if type(current_object) == pygit2.Blob:
+            blob = current_object
+            current_object = temp_object
         # except:
-            # return current_tree
-    return current_tree
+            # return current_object
+    return current_object, blob
 
 
 @wevolver_auth
-@has_permission_to('read')
+# @has_permission_to('read')
 def show_file(request, user, project_name, access_token):
     """ Grabs and returns a single file from a user's repository
 
@@ -161,31 +166,20 @@ def show_file(request, user, project_name, access_token):
     directory = generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
-        git_object = walk_tree(repo, path)
-        if type(git_object) == pygit2.Tree:
-            return JsonResponse(parse_file_tree(git_object))
-        else:
-            return JsonResponse({'file': str(base64.b64encode(git_object.data), 'utf-8')})
-    return JsonResponse({'file': 'None'})
+        git_tree, git_blob = walk_tree(repo, path)
+        parsed_tree = None
+        parsed_file = None
+        if type(git_tree) == pygit2.Tree:
+            parsed_tree = parse_file_tree(git_tree)
+            # return JsonResponse(parse_file_tree(git_tree))
+        if type(git_blob) == pygit2.Blob:
+            parsed_file = str(base64.b64encode(git_blob.data), 'utf-8')
 
-# @wevolver_auth
-# @has_permission_to('read')
-# def list_files(request, user, project_name, access_token):
-    """ Grabs and returns all files from a user's repository
+        return JsonResponse({'file': parsed_file, 'tree': parsed_tree})
+        # else:
+        #     return JsonResponse({'file': str(base64.b64encode(git_object.data), 'utf-8')})
+    return JsonResponse({'file': 'None', 'tree': 'None'})
 
-    Args:
-        user (string): The user's name.
-        project_name (string): The user's repository name.
-
-    Returns:
-        JsonResponse: An object with the requested repository's files
-    """
-
-    # directory = generate_directory(user)
-    # if os.path.exists(os.path.join('./repos', directory)):
-    #     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-    #     tree = repo.revparse_single('master').tree
-    # return JsonResponse(parse_file_tree(tree))
 
 @wevolver_auth
 def list_repos(request, user, access_token):
@@ -237,11 +231,11 @@ def add_blob_to_tree(previous_commit_tree, repo, blob, path, name):
 
 def commit_blob(repo, blob, path, name='readme.md'):
     previous_commit_tree = repo.revparse_single('master').tree
-    newTree = add_blob_to_tree(previous_commit_tree, repo, blob, path.split(','), name)
+    newTree = add_blob_to_tree(previous_commit_tree, repo, blob, path, name)
     if newTree:
         index = repo.index
         index.read()
-        entry = pygit2.IndexEntry(path + name, blob, GIT_FILEMODE_BLOB)
+        entry = pygit2.IndexEntry('/'.join(path) + name, blob, GIT_FILEMODE_BLOB)
         index.add(entry)
         index.write()
 
@@ -269,7 +263,9 @@ def create_new_folder(request, user, project_name, access_token):
     """
     directory = generate_directory(user)
     post = json.loads(request.body)
-    path = ','.join(post['path'])
+    path = post['path'].split('/')
+    print('PAAAATTTTTTHHHHH')
+    print(path)
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
     blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
     commit_blob(repo, blob, path, 'readme.md')
@@ -298,7 +294,7 @@ def upload_file(request, user, project_name, access_token):
     if request.FILES['file']:
         name = request.FILES['file'].name
         blob = repo.create_blob(request.FILES['file'].read())
-        commit_blob(repo, blob, path, name)
+        commit_blob(repo, blob, path.split(','), name)
 
     return JsonResponse({'message': 'File uploaded'})
 
