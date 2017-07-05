@@ -53,7 +53,7 @@ def wevolver_auth(function):
     """
 
     def wrap(request, *args, **kwargs):
-        headers = request.GET.get("access_token")
+        headers = request.META.get('Authorization', None)
         kwargs['access_token'] = headers
         user = request.GET.get("user_id")
         if refresh(user, headers):

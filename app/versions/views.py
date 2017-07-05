@@ -68,7 +68,6 @@ def parse_file_tree(tree):
         dict: A list of all files in the top level of the provided tree.
     """
 
-    logging.debug("Given tree is type {}".format(type(tree)))
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
 @wevolver_auth
@@ -124,26 +123,23 @@ def delete(request, user, project_name, access_token):
     return HttpResponse("Deleted at ./repos/{}/{}".format(user, project_name))
 
 def walk_tree(repo, full_path):
+    current_object = repo.revparse_single('master').tree
     locations = full_path.split('/')
     if locations[0] == "":
         locations = []
-    current_object = repo.revparse_single('master').tree
     blob = None
     for location in locations:
-        # try:
         next_object = current_object.__getitem__(location)
         temp_object = current_object
         current_object = repo.get(next_object.id)
         if type(current_object) == pygit2.Blob:
             blob = current_object
             current_object = temp_object
-        # except:
-            # return current_object
     return current_object, blob
 
 
 @wevolver_auth
-# @has_permission_to('read')
+@has_permission_to('read')
 def show_file(request, user, project_name, access_token):
     """ Grabs and returns a single file from a user's repository
 
@@ -168,13 +164,10 @@ def show_file(request, user, project_name, access_token):
         parsed_file = None
         if type(git_tree) == pygit2.Tree:
             parsed_tree = parse_file_tree(git_tree)
-            # return JsonResponse(parse_file_tree(git_tree))
         if type(git_blob) == pygit2.Blob:
             parsed_file = str(base64.b64encode(git_blob.data), 'utf-8')
 
         return JsonResponse({'file': parsed_file, 'tree': parsed_tree})
-        # else:
-        #     return JsonResponse({'file': str(base64.b64encode(git_object.data), 'utf-8')})
     return JsonResponse({'file': 'None', 'tree': 'None'})
 
 
@@ -193,14 +186,6 @@ def list_repos(request, user, access_token):
     path = os.path.join("./repos", directory)
     directories = [name for name in os.listdir(path)] if os.path.exists(path) else []
     return JsonResponse({'data': directories})
-
-def add_blob_to_index(repo, blob, path, name):
-    index = repo.index
-    index.read()
-    entry = pygit2.IndexEntry('/'.join(path) + name, blob, GIT_FILEMODE_BLOB)
-    index.add(entry)
-    index.write()
-    return True
 
 def add_blobs_to_tree(previous_commit_tree, repo, blobs, path):
     current_tree = previous_commit_tree
@@ -228,18 +213,14 @@ def add_blobs_to_tree(previous_commit_tree, repo, blobs, path):
 
         previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
         previous_commit_tree_builder.insert(path[0], current_tree_builder.write(), GIT_FILEMODE_TREE)
-        # add_blob_to_index(repo, blob, path, name)
         return previous_commit_tree_builder.write()
     else:
         previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
         for blob, name in blobs:
             previous_commit_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
-        # add_blob_to_index(repo, blob, path, name)
         return previous_commit_tree_builder.write()
 
 def commit_tree(repo, newTree):
-    # generate new commit, the function takes a tree so we generate one from the new index file.
-    # TODO: Signature should be the real user's email.
     signature = Signature('Tester', 'test@example.com', int(time()), 0)
     commit = repo.create_commit(repo.head.name, signature, signature, 'Test commit with pygit2', newTree, [repo.head.peel().id])
 
@@ -258,13 +239,10 @@ def create_new_folder(request, user, project_name, access_token):
         user (string): The user's name.
         project_name (string): The user's repository name.
 
-    Body:
-        File
-        path
-
     Returns:
         JsonResponse: An object
     """
+
     directory = generate_directory(user)
     post = json.loads(request.body)
     path = post['path'].split('/')
@@ -282,10 +260,6 @@ def upload_file(request, user, project_name, access_token):
         user (string): The user's name.
         project_name (string): The user's repository name.
 
-    Body:
-        File
-        path
-
     Returns:
         JsonResponse: An object
     """
@@ -301,10 +275,7 @@ def upload_file(request, user, project_name, access_token):
             blobs.append((blob, file.name))
 
         new_commit_tree = add_blobs_to_tree(old_commit_tree, repo, blobs, path.split('/'))
-
-        
         commit_tree(repo, new_commit_tree)
-
 
     return JsonResponse({'message': 'Files uploaded'})
 
@@ -358,12 +329,14 @@ def info_refs(request, user, project_name, access_token):
 @has_permission_to('read')
 def upload_pack(request, user, project_name, access_token):
     """ Calls service_rpc assuming the user is authenicated and has read permissions """
+
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
 @git_access_required
 @has_permission_to('write')
 def receive_pack(request, user, project_name, access_token):
     """ Calls service_rpc assuming the user is authenicated and has write permissions """
+
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
 def service_rpc(user, project_name, request_service, request_body):
