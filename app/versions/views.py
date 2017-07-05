@@ -202,7 +202,7 @@ def add_blob_to_index(repo, blob, path, name):
     index.write()
     return True
 
-def add_blob_to_tree(previous_commit_tree, repo, blob, path, name):
+def add_blobs_to_tree(previous_commit_tree, repo, blobs, path):
     current_tree = previous_commit_tree
     trees = []
 
@@ -217,7 +217,8 @@ def add_blob_to_tree(previous_commit_tree, repo, blob, path, name):
 
         is_tree = trees[-1]
         current_tree_builder = repo.TreeBuilder(trees[-1]) if is_tree else repo.TreeBuilder()
-        current_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
+        for blob, name in blobs:
+            current_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
 
         for index in range(len(path) - 1, 0, -1):
             previous_tree_builder = current_tree_builder
@@ -231,7 +232,8 @@ def add_blob_to_tree(previous_commit_tree, repo, blob, path, name):
         return previous_commit_tree_builder.write()
     else:
         previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
-        previous_commit_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
+        for blob, name in blobs:
+            previous_commit_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
         # add_blob_to_index(repo, blob, path, name)
         return previous_commit_tree_builder.write()
 
@@ -243,7 +245,7 @@ def commit_tree(repo, newTree):
 
 def commit_blob(repo, blob, path, name='readme.md'):
     previous_commit_tree = repo.revparse_single('master').tree
-    newTree = add_blob_to_tree(previous_commit_tree, repo, blob, path, name)
+    newTree = add_blobs_to_tree(previous_commit_tree, repo, [(blob, name)], path)
     if newTree:
         commit_tree(repo, newTree)
 
@@ -293,12 +295,14 @@ def upload_file(request, user, project_name, access_token):
 
     if request.FILES:
         old_commit_tree = repo.revparse_single('master').tree
-
+        blobs = []
         for key, file in request.FILES.items():
             blob = repo.create_blob(file.read())
-            new_commit_tree = add_blob_to_tree(old_commit_tree, repo, blob, path.split('/'), file.name)
-            old_commit_tree = new_commit_tree
-            
+            blobs.append((blob, file.name))
+
+        new_commit_tree = add_blobs_to_tree(old_commit_tree, repo, blobs, path.split('/'))
+
+        
         commit_tree(repo, new_commit_tree)
 
 
