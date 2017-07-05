@@ -94,16 +94,14 @@ def create(request, user, project_name, access_token):
     comitter = pygit2.Signature('Wevolver', 'Wevolver')
     parents = []
 
-    index = repo.index
-    index.read()
-    tree = index.write_tree()
+    tree = repo.TreeBuilder()
+    blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
+    tree.insert('readme.md', blob, GIT_FILEMODE_BLOB)
 
     sha = repo.create_commit('HEAD',
                              comitter, comitter, message,
-                             tree, [])
+                             tree.write(), [])
 
-    blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
-    commit_blob(repo, blob, 'readme.md')
     return HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
 
 @wevolver_auth
