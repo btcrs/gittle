@@ -128,7 +128,6 @@ def walk_tree(repo, full_path):
     if locations[0] == "":
         locations = []
     current_object = repo.revparse_single('master').tree
-    print(locations)
     blob = None
     for location in locations:
         # try:
@@ -195,6 +194,13 @@ def list_repos(request, user, access_token):
     directories = [name for name in os.listdir(path)] if os.path.exists(path) else []
     return JsonResponse({'data': directories})
 
+def add_blob_to_index(repo, blob, path, name):
+    index = repo.index
+    index.read()
+    entry = pygit2.IndexEntry('/'.join(path) + name, blob, GIT_FILEMODE_BLOB)
+    index.add(entry)
+    index.write()
+    return True
 
 def add_blob_to_tree(previous_commit_tree, repo, blob, path, name):
     current_tree = previous_commit_tree
@@ -221,27 +227,25 @@ def add_blob_to_tree(previous_commit_tree, repo, blob, path, name):
 
         previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
         previous_commit_tree_builder.insert(path[0], current_tree_builder.write(), GIT_FILEMODE_TREE)
+        # add_blob_to_index(repo, blob, path, name)
         return previous_commit_tree_builder.write()
     else:
         previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
         previous_commit_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
+        # add_blob_to_index(repo, blob, path, name)
         return previous_commit_tree_builder.write()
+
+def commit_tree(repo, newTree):
+    # generate new commit, the function takes a tree so we generate one from the new index file.
+    # TODO: Signature should be the real user's email.
+    signature = Signature('Tester', 'test@example.com', int(time()), 0)
+    commit = repo.create_commit(repo.head.name, signature, signature, 'Test commit with pygit2', newTree, [repo.head.peel().id])
 
 def commit_blob(repo, blob, path, name='readme.md'):
     previous_commit_tree = repo.revparse_single('master').tree
     newTree = add_blob_to_tree(previous_commit_tree, repo, blob, path, name)
     if newTree:
-        index = repo.index
-        index.read()
-        entry = pygit2.IndexEntry('/'.join(path) + name, blob, GIT_FILEMODE_BLOB)
-        index.add(entry)
-        index.write()
-
-        # generate new commit, the function takes a tree so we generate one from the new index file.
-        # TODO: Signature should be the real user's email.
-        signature = Signature('Tester', 'test@example.com', int(time()), 0)
-        commit = repo.create_commit(repo.head.name, signature, signature, 'Test commit with pygit2', newTree, [repo.head.peel().id])
-
+        commit_tree(repo, newTree)
 
 @wevolver_auth
 @require_http_methods(["POST"])
@@ -262,8 +266,6 @@ def create_new_folder(request, user, project_name, access_token):
     directory = generate_directory(user)
     post = json.loads(request.body)
     path = post['path'].split('/')
-    print('PAAAATTTTTTHHHHH')
-    print(path)
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
     blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
     commit_blob(repo, blob, path, 'readme.md')
@@ -286,15 +288,21 @@ def upload_file(request, user, project_name, access_token):
         JsonResponse: An object
     """
     directory = generate_directory(user)
-    path = request.POST['path']
+    path = request.GET.get('path').rstrip('/')
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
 
-    if request.FILES['file']:
-        name = request.FILES['file'].name
-        blob = repo.create_blob(request.FILES['file'].read())
-        commit_blob(repo, blob, path.split(','), name)
+    if request.FILES:
+        old_commit_tree = repo.revparse_single('master').tree
 
-    return JsonResponse({'message': 'File uploaded'})
+        for key, file in request.FILES.items():
+            blob = repo.create_blob(file.read())
+            new_commit_tree = add_blob_to_tree(old_commit_tree, repo, blob, path.split('/'), file.name)
+            old_commit_tree = new_commit_tree
+            
+        commit_tree(repo, new_commit_tree)
+
+
+    return JsonResponse({'message': 'Files uploaded'})
 
 @wevolver_auth
 @has_permission_to('read')
