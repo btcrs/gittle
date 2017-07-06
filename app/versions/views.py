@@ -26,7 +26,7 @@ import os
 logger = logging.getLogger(__name__)
 
 class Actions(Enum):
-    advertisement = 'advertisement'
+    advertisement = 'advertisement' 
     result = 'result'
 
 @require_http_methods(["POST"])
@@ -141,7 +141,7 @@ def walk_tree(repo, full_path):
 @wevolver_auth
 @has_permission_to('read')
 def show_file(request, user, project_name, access_token):
-    """ Grabs and returns a single file from a user's repository
+    """ Grabs and returns a single file or a tree from a user's repository
 
     if the requested object is a tree the function parses it intstead
     of returning blindly.

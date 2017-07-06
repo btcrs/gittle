@@ -7,3 +7,6 @@ app/db.sqlite3
 /test
 __pycache__
 dd.sqlite3
+run.sh
+app/secrets.json
+run.sh
