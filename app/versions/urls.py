@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     url(r'^login', views.login, name='login'),
     url(r'^create/(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)$', views.create, name='create'),
-    url(r'^delete/(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)$', views.delete, name='delete'),
+    url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/delete$', views.delete, name='delete'),
     url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/archive$', views.download_archive, name='download-archive'),
     url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/upload$', views.upload_file, name='upload-file'),
     url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/newfolder$', views.create_new_folder, name='new-folder'),
