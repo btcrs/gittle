@@ -25,8 +25,9 @@ class VersionsViewsTestCase(TestCase):
         }
         login = login_client.post('/login', json.dumps(login_data), content_type="application/json")
         body = json.loads(login.content)
-        cls.app = 'myapp'
+        cls.app = '234314'
         cls.token = body['access_token']
+        cls.username = 'rodrigo.trespalacios'
         cls.user = body['user'].split('/')[-2]
 
     @classmethod
@@ -37,14 +38,14 @@ class VersionsViewsTestCase(TestCase):
             shutil.rmtree(path)
 
     def setUp(self):
-        response = self.client.get('/create/rodrigo/{}'.format(self.app), {'access_token': self.token, 'user_id': self.user})
+        response = self.client.get('/create/{}/{}'.format(self.username, self.app), {'access_token': self.token, 'user_id': self.user})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Created at ./repos/rodrigo/{}'.format(self.app).encode() in response.content)
+        self.assertTrue('Created at ./repos/{}/{}'.format(self.username, self.app).encode() in response.content)
 
     def tearDown(self):
-        response = self.client.get('/delete/rodrigo/{}'.format(self.app), {'access_token': self.token, 'user_id': self.user})
+        response = self.client.get('/delete/{}/{}'.format(self.username, self.app), {'access_token': self.token, 'user_id': self.user})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('Deleted at ./repos/rodrigo/{}'.format(self.app).encode() in response.content)
+        self.assertTrue('Deleted at ./repos/{}/{}'.format(self.username, self.app).encode() in response.content)
 
     def test_path_generation(self):
         path = generate_directory('rodrigo')
@@ -55,33 +56,29 @@ class VersionsViewsTestCase(TestCase):
         self.assertEqual(len(path.split('/')), 5)
 
     def test_created_bare(self):
-        path = generate_directory('rodrigo')
+        path = generate_directory(self.username)
         path = os.path.join("./repos", path, self.app)
         repo = Repository(path)
         self.assertTrue(repo.is_bare)
 
-    def test_list_projects(self):
-        response = self.client.get('/rodrigo', {'access_token': self.token, 'user_id': self.user})
-        self.assertTrue(self.app in json.loads(response.content)['data'])
-
     def test_add_files(self):
         with open('./secrets.json') as fp:
-            response = self.client.post('/rodrigo/{}/upload?access_token={}&user_id={}'.format(self.app, self.token, self.user), {'file': fp, 'path': 'test.json'})
+            response = self.client.post('/{}/{}/upload?access_token={}&user_id={}'.format(self.username, self.app, self.token, self.user), {'file': fp, 'path': 'test.json'})
         self.assertTrue(b'File uploaded' in response.content)
 
     def test_list_files(self):
         with open('./secrets.json') as fp:
-            self.client.post('/rodrigo/{}/upload?access_token={}&user_id={}'.format(self.app, self.token, self.user), {'file': fp, 'path': 'test.json'})
-        response = self.client.get('/rodrigo/{}'.format(self.app), {'access_token': self.token, 'user_id': self.user})
+            self.client.post('/{}/{}/upload?access_token={}&user_id={}'.format(self.username, self.app, self.token, self.user), {'file': fp, 'path': 'test.json'})
+        response = self.client.get('/{}/{}'.format(self.username, self.app), {'access_token': self.token, 'user_id': self.user})
         self.assertEqual('readme.md', json.loads(response.content)['data'][0]['name'])
         self.assertEqual('test.json', json.loads(response.content)['data'][1]['name'])
 
     def test_show_file(self):
-        response = self.client.get('/rodrigo/{}'.format(self.app), {'access_token': self.token, 'user_id': self.user})
+        response = self.client.get('/{}/{}'.format(self.username, self.app), {'access_token': self.token, 'user_id': self.user})
         oid = json.loads(response.content)['data'][0]['oid']
-        response = self.client.get('/rodrigo/{}/{}'.format(self.app, oid), {'access_token': self.token, 'user_id': self.user})
+        response = self.client.get('/{}/{}/{}'.format(self.username, self.app, oid), {'access_token': self.token, 'user_id': self.user})
         oid = json.loads(response.content)['data'][0]['oid']
-        response = self.client.get('/rodrigo/{}/{}'.format(self.app, oid), {'access_token': self.token, 'user_id': self.user})
+        response = self.client.get('/{}/{}/{}'.format(self.username, self.app, oid), {'access_token': self.token, 'user_id': self.user})
         self.assertEqual(str(base64.b64encode(b'Readme File Commitfed Automatically Upon Creation'), 'utf-8'), json.loads(response.content)['file'])
 
     def test_permissions(self):
