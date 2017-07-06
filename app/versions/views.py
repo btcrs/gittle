@@ -26,7 +26,7 @@ import os
 logger = logging.getLogger(__name__)
 
 class Actions(Enum):
-    advertisement = 'advertisement' 
+    advertisement = 'advertisement'
     result = 'result'
 
 @require_http_methods(["POST"])
@@ -94,7 +94,8 @@ def create(request, user, project_name, access_token):
     parents = []
 
     tree = repo.TreeBuilder()
-    blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
+    readme = "#{} \nThis is where you should document your project  \n### Getting Started".format(project_name)
+    blob = repo.create_blob(readme)
     tree.insert('readme.md', blob, GIT_FILEMODE_BLOB)
 
     sha = repo.create_commit('HEAD',

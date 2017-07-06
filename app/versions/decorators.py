@@ -64,8 +64,6 @@ def wevolver_auth(function):
 
     def wrap(request, *args, **kwargs):
         headers = request.META.get('HTTP_AUTHORIZATION', None)
-        print('headers') 
-        print(headers)
         kwargs['access_token'] = headers
         user = request.GET.get("user_id")
         success, response = checktoken(user, kwargs['user'], kwargs['project_name'], headers)
