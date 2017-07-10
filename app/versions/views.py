@@ -26,6 +26,7 @@ import shutil
 import json
 import csv
 import os
+import tokenlib
 
 from io import BytesIO
 
@@ -348,7 +349,20 @@ def upload_file(request, user, project_name, access_token):
 
 @wevolver_auth
 @has_permission_to('read')
-def download_archive(request, user, project_name, access_token):
+def get_archive_token(request, user, project_name, access_token):
+    """ Return a fast expiration token to allow downlaod of archive
+
+    Args:
+        user (string): The user's name.
+        project_name (string): The user's repository name.
+
+    Returns:
+        JsonResponse: An object with the archive download token
+    """
+    token = tokenlib.make_token({"project_name": project_name}, timeout=1, secret=settings.TOKEN_SECRET)
+    return JsonResponse({'token': token})
+
+def download_archive(request, user, project_name):
     """ Grabs and returns all of a user's repository as a tarball
 
     Args:
@@ -358,17 +372,25 @@ def download_archive(request, user, project_name, access_token):
     Returns:
         JsonResponse: An object with the requested user's repository as a tarball
     """
+    token = request.GET.get("token")
+    if token:
+        try:
+            parsed_token = tokenlib.parse_token(token, secret=settings.TOKEN_SECRET)
+        except:
+            raise PermissionDenied
+        else:
+            filename = project_name + '.tar'
+            response = HttpResponse(content_type='application/x-gzip')
+            response['Content-Disposition'] = 'attachment; filename=' + filename
 
-    filename = project_name + '.tar'
-    response = HttpResponse(content_type='application/x-gzip')
-    response['Content-Disposition'] = 'attachment; filename=' + filename
-
-    directory = generate_directory(user)
-    with tarfile.open(fileobj=response, mode='w') as archive:
-        repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-        repo.write_archive(repo.head.target, archive)
-
-    return response
+            directory = generate_directory(user)
+            with tarfile.open(fileobj=response, mode='w') as archive:
+                repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
+                repo.write_archive(repo.head.target, archive)
+            print('ARRRRCHIVE')
+            return response
+    else:
+        raise PermissionDenied
 
 
 @git_access_required

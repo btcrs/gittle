@@ -20,5 +20,6 @@ RUN pip install django-robots
 RUN pip3 install django-cors-headers
 RUN pip install coverage
 RUN pip install coveralls
+RUN pip install tokenlib
 
 RUN ldconfig
