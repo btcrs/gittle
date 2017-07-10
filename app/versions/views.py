@@ -7,10 +7,13 @@ from time import time
 from enum import Enum
 
 from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse, JsonResponse
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse, JsonResponse
+from django.http import StreamingHttpResponse
+from wsgiref.util import FileWrapper
 from django.conf import settings
 
+import mimetypes
 import requests
 import logging
 import os.path
@@ -21,13 +24,77 @@ import pygit2
 import urllib
 import shutil
 import json
+import csv
 import os
+
+from io import BytesIO
 
 logger = logging.getLogger(__name__)
 
 class Actions(Enum):
     advertisement = 'advertisement'
     result = 'result'
+
+def flatten(tree, repo):
+    flattened = []
+    for entry in tree:
+        if entry.type == 'tree':
+            flattened.extend(flatten(repo[entry.id], repo))
+        else:
+            flattened.append(entry)
+    return flattened
+
+# @wevolver_auth
+# @has_permission_to('read')    ,access_token
+def render_file(request, user, project_name):
+    path = request.GET.get('path').rstrip('/')
+    directory = generate_directory(user)
+    if os.path.exists(os.path.join('./repos', directory)):
+        repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
+        git_tree, git_blob = walk_tree(repo, path)
+        parsed_file = None
+        if type(git_blob) == pygit2.Blob:
+            parsed_file = str(base64.b64encode(git_blob.data), 'utf-8')
+        chunk_size = 8192
+        filelike = FileWrapper(BytesIO(git_blob.data), chunk_size)
+        response = StreamingHttpResponse(filelike,
+                               content_type=mimetypes.guess_type(path)[0])
+        response['Content-Length'] = len(git_blob.data)
+        # response['Content-Disposition'] = "attachment; filename=%s" % path
+        return response
+
+def download_file(request, user, project_name):
+    path = request.GET.get('path').rstrip('/')
+    directory = generate_directory(user)
+    if os.path.exists(os.path.join('./repos', directory)):
+        repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
+        git_tree, git_blob = walk_tree(repo, path)
+        parsed_file = None
+        if type(git_blob) == pygit2.Blob:
+            parsed_file = str(base64.b64encode(git_blob.data), 'utf-8')
+        chunk_size = 8192
+        filelike = FileWrapper(BytesIO(git_blob.data), chunk_size)
+        response = StreamingHttpResponse(filelike,
+                               content_type=mimetypes.guess_type(path)[0])
+        response['Content-Length'] = len(git_blob.data)
+        response['Content-Disposition'] = "attachment; filename=%s" % path
+        return response
+
+
+@wevolver_auth
+@has_permission_to('read')
+def listbom(request, user, project_name, access_token):
+    directory = generate_directory(user)
+    if os.path.exists(os.path.join('./repos', directory)):
+        repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
+        tree = (repo.revparse_single('master').tree)
+        blobs = flatten(tree, repo)
+        data = ''
+        for b in [blob for blob in blobs if blob.name == 'bom.csv']:
+            data += str(repo[b.id].data, 'utf-8')
+        return HttpResponse(data)
+    return HttpResponse('Failed')
+
 
 @require_http_methods(["POST"])
 def login(request):
@@ -156,7 +223,6 @@ def show_file(request, user, project_name, access_token):
         JsonResponse: An object with the requested file's data
     """
     path = request.GET.get('path').rstrip('/')
-
     directory = generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))

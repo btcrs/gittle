@@ -151,3 +151,5 @@ def get_secret(setting, secrets=secrets):
 
 API_BASE = get_secret("API_BASE")
 AUTH_BASE = get_secret("AUTH_BASE")
+TEST_API_BASE = get_secret("TEST_API_BASE")
+TEST_AUTH_BASE = get_secret("TEST_AUTH_BASE")
