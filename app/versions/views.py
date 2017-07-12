@@ -313,10 +313,10 @@ def create_new_folder(request, user, project_name, access_token):
 
     directory = generate_directory(user)
     post = json.loads(request.body)
-    path = post['path'].split('/')
+    path = post['path'].lstrip('/').rstrip('/')
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
     blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
-    commit_blob(repo, blob, path, 'readme.md')
+    commit_blob(repo, blob, path.split('/'), 'readme.md')
     return JsonResponse({'message': 'Folder Created'})
 
 @wevolver_auth
