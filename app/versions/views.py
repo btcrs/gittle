@@ -46,7 +46,7 @@ def flatten(tree, repo):
     return flattened
 
 # @wevolver_auth
-# @has_permission_to('read')    ,access_token
+# @has_permission_to('read')    ,access_token=None
 def render_file(request, user, project_name):
     path = request.GET.get('path').rstrip('/')
     directory = generate_directory(user)
@@ -82,9 +82,9 @@ def download_file(request, user, project_name):
         return response
 
 
-@wevolver_auth
-@has_permission_to('read')
-def listbom(request, user, project_name, access_token):
+# @wevolver_auth
+# @has_permission_to('read')
+def listbom(request, user, project_name, access_token=None):
     directory = generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
@@ -138,8 +138,8 @@ def parse_file_tree(tree):
 
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
-@wevolver_auth
-def create(request, user, project_name, access_token):
+# @wevolver_auth
+def create(request, user, project_name, access_token=None):
     """ Creates a bare repository with the provided name
 
     Args:
@@ -172,9 +172,9 @@ def create(request, user, project_name, access_token):
 
     return HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
 
-@wevolver_auth
-@has_permission_to('write')
-def delete(request, user, project_name, access_token):
+# @wevolver_auth
+# @has_permission_to('write')
+def delete(request, user, project_name, access_token=None):
     """ Deletes the repository with the provided name
 
     Args:
@@ -207,9 +207,9 @@ def walk_tree(repo, full_path):
     return current_object, blob
 
 
-@wevolver_auth
-@has_permission_to('read')
-def show_file(request, user, project_name, access_token):
+# @wevolver_auth
+# @has_permission_to('read')
+def show_file(request, user, project_name, access_token=None):
     """ Grabs and returns a single file or a tree from a user's repository
 
     if the requested object is a tree the function parses it intstead
@@ -239,8 +239,8 @@ def show_file(request, user, project_name, access_token):
     return JsonResponse({'file': 'None', 'tree': 'None'})
 
 
-@wevolver_auth
-def list_repos(request, user, access_token):
+# @wevolver_auth
+def list_repos(request, user, access_token=None):
     """ Grabs and returns all of a user's repository
 
     Args:
@@ -298,9 +298,9 @@ def commit_blob(repo, blob, path, name='readme.md'):
     if newTree:
         commit_tree(repo, newTree)
 
-@wevolver_auth
-@require_http_methods(["POST"])
-def create_new_folder(request, user, project_name, access_token):
+# @wevolver_auth
+# @require_http_methods(["POST"])
+def create_new_folder(request, user, project_name, access_token=None):
     """ Commits a single file to a specific path to create new folder in tree
 
     Args:
@@ -319,9 +319,9 @@ def create_new_folder(request, user, project_name, access_token):
     commit_blob(repo, blob, path.split('/'), 'readme.md')
     return JsonResponse({'message': 'Folder Created'})
 
-@wevolver_auth
-@require_http_methods(["POST"])
-def upload_file(request, user, project_name, access_token):
+# @wevolver_auth
+# @require_http_methods(["POST"])
+def upload_file(request, user, project_name, access_token=None):
     """ Uploads and commits a single file to a specific path in a user's repository
 
     Args:
@@ -347,9 +347,9 @@ def upload_file(request, user, project_name, access_token):
 
     return JsonResponse({'message': 'Files uploaded'})
 
-@wevolver_auth
-@has_permission_to('read')
-def get_archive_token(request, user, project_name, access_token):
+# @wevolver_auth
+# @has_permission_to('read')
+def get_archive_token(request, user, project_name, access_token=None):
     """ Return a fast expiration token to allow downlaod of archive
 
     Args:
@@ -393,9 +393,9 @@ def download_archive(request, user, project_name):
         raise PermissionDenied
 
 
-@git_access_required
-@has_permission_to('read')
-def info_refs(request, user, project_name, access_token):
+# @git_access_required
+# @has_permission_to('read')
+def info_refs(request, user, project_name, access_token=None):
     """ Initiates a handshake for a smart HTTP connection
 
     https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
@@ -414,16 +414,16 @@ def info_refs(request, user, project_name, access_token):
                            repository=requested_repo, data=None)
     return response.get_http_info_refs()
 
-@git_access_required
-@has_permission_to('read')
-def upload_pack(request, user, project_name, access_token):
+# @git_access_required
+# @has_permission_to('read')
+def upload_pack(request, user, project_name, access_token=None):
     """ Calls service_rpc assuming the user is authenicated and has read permissions """
 
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
-@git_access_required
-@has_permission_to('write')
-def receive_pack(request, user, project_name, access_token):
+# @git_access_required
+# @has_permission_to('write')
+def receive_pack(request, user, project_name, access_token=None):
     """ Calls service_rpc assuming the user is authenicated and has write permissions """
 
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)

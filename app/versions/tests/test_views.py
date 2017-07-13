@@ -1,19 +1,21 @@
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature, IndexEntry
-from django.test import TestCase
-from django.test import Client
-from django.conf import settings
 from django.test.utils import override_settings
 from versions.views import generate_directory
+from django.conf import settings
+from django.test import TestCase
+from django.test import Client
+from functools import wraps
 from time import time
-import time
 import logging
 import shutil
 import base64
 import json
+import time
 import os
 
 logger = logging.getLogger(__name__)
 logging.disable(logging.CRITICAL)
+
 
 @override_settings(API_BASE=settings.TEST_API_BASE)
 @override_settings(AUTH_BASE=settings.TEST_AUTH_BASE)
@@ -41,7 +43,7 @@ class VersionsViewsTestCase(TestCase):
             shutil.rmtree(path)
 
     def setUp(self):
-        response = self.client.get('/create/{}/{}'.format(self.username, self.app), { 'user_id': self.user}, HTTP_AUTHORIZATION='{}'.format(self.token))
+        response = self.client.get('/create/{}/{}'.format(self.username, self.app), { 'user_id': self.user}, HTTP_AUTHORIZATION='Bearer {}'.format(self.token))
         print(response)
         self.assertEqual(response.status_code, 200)
         self.assertTrue('Created at ./repos/{}/{}'.format(self.username, self.app).encode() in response.content)

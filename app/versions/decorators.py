@@ -2,6 +2,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.http import HttpResponseForbidden
 from django.conf import settings
+from profilehooks import profile
 from functools import wraps
 import requests
 import logging
@@ -77,6 +78,7 @@ def wevolver_auth(function):
     wrap.__name__ = function.__name__
     return wrap
 
+# @profile(immediate=True)
 def checktoken(user, user_name, project_name, authorization):
     """ Checks against the Wevolver API to see if the users token is currently valid
 
@@ -85,6 +87,7 @@ def checktoken(user, user_name, project_name, authorization):
         user (str): the current requesting user's id
     """
     url = "{}/users/{}/checktoken/?project={}/{}".format(settings.API_BASE, user, user_name, project_name)
+    print(url)
     headers = {'Authorization': 'Bearer {}'.format(authorization)}
     response = requests.get(url, headers=headers)
     return (response.status_code == requests.codes.ok, response)
@@ -95,6 +98,7 @@ def has_permission_to(permission):
     Calls the project permission endpoint with the current user's id to
     get a list of permissions based on their role
     """
+    # @profile(immediate=True)
     def has_permission(func):
         @wraps(func)
         def _decorator(request, *args, **kwargs):
