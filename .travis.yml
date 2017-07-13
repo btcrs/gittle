@@ -11,7 +11,7 @@ before_install:
 
 script:
       # - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code btcrs/groot /bin/sh -c 'cd ./app && coverage run --source=./ manage.py test'
-      - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code btcrs/groot /bin/sh -c 'cd ./appp && ls'
+      - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code btcrs/groot /bin/sh -c 'cd ./app && ls'
 
 after_success:
       - test $TRAVIS_BRANCH = "master" && docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
