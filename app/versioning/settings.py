@@ -1,6 +1,14 @@
 import os
 import json
 from django.core.exceptions import ImproperlyConfigured
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'Permissions',
+)
+CORS_EXPOSE_HEADERS = ['Permissions',]
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'ggec94x-e8!9pfqz2(ev32gxpq#w)81v4wa@cuc3tur77$s!1a'
@@ -73,7 +81,6 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-CORS_ORIGIN_ALLOW_ALL = True
 
 if not os.path.exists('logs/'):
     os.makedirs('logs/')

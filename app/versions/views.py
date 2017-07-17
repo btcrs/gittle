@@ -1,5 +1,5 @@
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
-from versions.decorators import git_access_required, requires_permission_to
+from versions.decorators import requires_git_permission_to, requires_permission_to
 from wsgiref.util import FileWrapper
 from versions.git import GitResponse
 from functools import wraps
@@ -94,7 +94,6 @@ def list_bom(request, user, project_name, permissions_token):
         response = HttpResponse(data)
     else:
         response = HttpResponse('Failed')
-    response['Permissions'] = permissions_token
     return response
 
 
@@ -304,7 +303,8 @@ def create_new_folder(request, user, project_name, permissions_token):
     post = json.loads(request.body)
     path = post['path'].lstrip('/').rstrip('/')
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-    blob = "#{} \nThis is where you should document your project  \n### Getting Started".format(project_name)
+    readme = "#{} \nThis is where you should document your project  \n### Getting Started".format(project_name)
+    blob = repo.create_blob(readme)
     commit_blob(repo, blob, path.split('/'), 'readme.md')
     response = JsonResponse({'message': 'Folder Created'})
     response['Permissions'] = permissions_token
@@ -388,9 +388,8 @@ def download_archive(request, user, project_name):
         raise PermissionDenied
 
 
-@git_access_required
-@requires_permission_to('read')
-def info_refs(request, user, project_name, permissions_token):
+@requires_git_permission_to('read')
+def info_refs(request, user, project_name):
     """ Initiates a handshake for a smart HTTP connection
 
     https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
@@ -409,16 +408,14 @@ def info_refs(request, user, project_name, permissions_token):
                            repository=requested_repo, data=None)
     return response.get_http_info_refs()
 
-@git_access_required
-@requires_permission_to('read')
-def upload_pack(request, user, project_name, access_token=None):
+@requires_git_permission_to('read')
+def upload_pack(request, user, project_name):
     """ Calls service_rpc assuming the user is authenicated and has read permissions """
 
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
-@git_access_required
-@requires_permission_to('write')
-def receive_pack(request, user, project_name, access_token=None):
+@requires_git_permission_to('write')
+def receive_pack(request, user, project_name):
     """ Calls service_rpc assuming the user is authenicated and has write permissions """
 
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
