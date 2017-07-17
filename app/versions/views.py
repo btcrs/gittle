@@ -1,8 +1,10 @@
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
-from versions.decorators import git_access_required, wevolver_auth, has_permission_to
+from versions.decorators import git_access_required, requires_permission_to
+from wsgiref.util import FileWrapper
 from versions.git import GitResponse
 from functools import wraps
 from urllib import parse
+from io import BytesIO
 from time import time
 from enum import Enum
 
@@ -10,10 +12,10 @@ from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.http import StreamingHttpResponse
-from wsgiref.util import FileWrapper
 from django.conf import settings
 
 import mimetypes
+import tokenlib
 import requests
 import logging
 import os.path
@@ -26,9 +28,6 @@ import shutil
 import json
 import csv
 import os
-import tokenlib
-
-from io import BytesIO
 
 logger = logging.getLogger(__name__)
 
@@ -45,9 +44,8 @@ def flatten(tree, repo):
             flattened.append(entry)
     return flattened
 
-# @wevolver_auth
-# @has_permission_to('read')    ,access_token=None
-def render_file(request, user, project_name):
+@requires_permission_to('read')
+def render_file(request, user, project_name, permissions_token):
     path = request.GET.get('path').rstrip('/')
     directory = generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
@@ -61,6 +59,7 @@ def render_file(request, user, project_name):
         response = StreamingHttpResponse(filelike,
                                content_type=mimetypes.guess_type(path)[0])
         response['Content-Length'] = len(git_blob.data)
+        response['Permissions'] = permissions_token
         # response['Content-Disposition'] = "attachment; filename=%s" % path
         return response
 
@@ -82,9 +81,8 @@ def download_file(request, user, project_name):
         return response
 
 
-# @wevolver_auth
-# @has_permission_to('read')
-def listbom(request, user, project_name, access_token=None):
+@requires_permission_to('read')
+def list_bom(request, user, project_name, permissions_token):
     directory = generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
@@ -93,8 +91,12 @@ def listbom(request, user, project_name, access_token=None):
         data = ''
         for b in [blob for blob in blobs if blob.name == 'bom.csv']:
             data += str(repo[b.id].data, 'utf-8')
-        return HttpResponse(data)
-    return HttpResponse('Failed')
+        response = HttpResponse(data)
+    else:
+        response = HttpResponse('Failed')
+    response['Permissions'] = permissions_token
+    return response
+
 
 
 @require_http_methods(["POST"])
@@ -138,8 +140,8 @@ def parse_file_tree(tree):
 
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
-# @wevolver_auth
-def create(request, user, project_name, access_token=None):
+@requires_permission_to("create")
+def create(request, user, project_name, permissions_token):
     """ Creates a bare repository with the provided name
 
     Args:
@@ -172,9 +174,8 @@ def create(request, user, project_name, access_token=None):
 
     return HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
 
-# @wevolver_auth
-# @has_permission_to('write')
-def delete(request, user, project_name, access_token=None):
+@requires_permission_to('write')
+def delete(request, user, project_name, permissions_token):
     """ Deletes the repository with the provided name
 
     Args:
@@ -189,7 +190,9 @@ def delete(request, user, project_name, access_token=None):
     if os.path.exists(os.path.join('./repos', directory)):
         path = os.path.join("./repos", directory, project_name)
         shutil.rmtree(path)
-    return HttpResponse("Deleted at ./repos/{}/{}".format(user, project_name))
+    response = HttpResponse("Deleted at ./repos/{}/{}".format(user, project_name))
+    response['Permissions'] = permissions_token
+    return response
 
 def walk_tree(repo, full_path):
     current_object = repo.revparse_single('master').tree
@@ -207,9 +210,8 @@ def walk_tree(repo, full_path):
     return current_object, blob
 
 
-# @wevolver_auth
-# @has_permission_to('read')
-def show_file(request, user, project_name, access_token=None):
+@requires_permission_to('read')
+def show_file(request, user, project_name, permissions_token):
     """ Grabs and returns a single file or a tree from a user's repository
 
     if the requested object is a tree the function parses it intstead
@@ -235,25 +237,11 @@ def show_file(request, user, project_name, access_token=None):
         if type(git_blob) == pygit2.Blob:
             parsed_file = str(base64.b64encode(git_blob.data), 'utf-8')
 
-        return JsonResponse({'file': parsed_file, 'tree': parsed_tree})
-    return JsonResponse({'file': 'None', 'tree': 'None'})
-
-
-# @wevolver_auth
-def list_repos(request, user, access_token=None):
-    """ Grabs and returns all of a user's repository
-
-    Args:
-        user (string): The user's name.
-
-    Returns:
-        JsonResponse: An object with the requested user's repositories
-    """
-
-    directory = generate_directory(user)
-    path = os.path.join("./repos", directory)
-    directories = [name for name in os.listdir(path)] if os.path.exists(path) else []
-    return JsonResponse({'data': directories})
+        response = JsonResponse({'file': parsed_file, 'tree': parsed_tree})
+    else:
+        response = JsonResponse({'file': 'None', 'tree': 'None'})
+    response['Permissions'] = permissions_token
+    return response
 
 def add_blobs_to_tree(previous_commit_tree, repo, blobs, path):
     current_tree = previous_commit_tree
@@ -298,9 +286,10 @@ def commit_blob(repo, blob, path, name='readme.md'):
     if newTree:
         commit_tree(repo, newTree)
 
-# @wevolver_auth
-# @require_http_methods(["POST"])
-def create_new_folder(request, user, project_name, access_token=None):
+
+@require_http_methods(["POST"])
+@requires_permission_to("write")
+def create_new_folder(request, user, project_name, permissions_token):
     """ Commits a single file to a specific path to create new folder in tree
 
     Args:
@@ -315,13 +304,16 @@ def create_new_folder(request, user, project_name, access_token=None):
     post = json.loads(request.body)
     path = post['path'].lstrip('/').rstrip('/')
     repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-    blob = repo.create_blob('Readme File Commitfed Automatically Upon Creation')
+    blob = "#{} \nThis is where you should document your project  \n### Getting Started".format(project_name)
     commit_blob(repo, blob, path.split('/'), 'readme.md')
-    return JsonResponse({'message': 'Folder Created'})
+    response = JsonResponse({'message': 'Folder Created'})
+    response['Permissions'] = permissions_token
+    return response
 
-# @wevolver_auth
-# @require_http_methods(["POST"])
-def upload_file(request, user, project_name, access_token=None):
+
+@require_http_methods(["POST"])
+@requires_permission_to("write")
+def upload_file(request, user, project_name, permissions_token):
     """ Uploads and commits a single file to a specific path in a user's repository
 
     Args:
@@ -345,11 +337,13 @@ def upload_file(request, user, project_name, access_token=None):
         new_commit_tree = add_blobs_to_tree(old_commit_tree, repo, blobs, path.split('/'))
         commit_tree(repo, new_commit_tree)
 
-    return JsonResponse({'message': 'Files uploaded'})
+    response = JsonResponse({'message': 'Files uploaded'})
+    response['Permissions'] = permissions_token
+    return response
 
-# @wevolver_auth
-# @has_permission_to('read')
-def get_archive_token(request, user, project_name, access_token=None):
+
+@requires_permission_to('read')
+def get_archive_token(request, user, project_name, permissions_token):
     """ Return a fast expiration token to allow downlaod of archive
 
     Args:
@@ -360,7 +354,9 @@ def get_archive_token(request, user, project_name, access_token=None):
         JsonResponse: An object with the archive download token
     """
     token = tokenlib.make_token({"project_name": project_name}, timeout=1, secret=settings.TOKEN_SECRET)
-    return JsonResponse({'token': token})
+    response = JsonResponse({'token': token})
+    response['Permissions'] = permissions_token
+    return response
 
 def download_archive(request, user, project_name):
     """ Grabs and returns all of a user's repository as a tarball
@@ -387,15 +383,14 @@ def download_archive(request, user, project_name):
             with tarfile.open(fileobj=response, mode='w') as archive:
                 repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
                 repo.write_archive(repo.head.target, archive)
-            print('ARRRRCHIVE')
             return response
     else:
         raise PermissionDenied
 
 
-# @git_access_required
-# @has_permission_to('read')
-def info_refs(request, user, project_name, access_token=None):
+@git_access_required
+@requires_permission_to('read')
+def info_refs(request, user, project_name, permissions_token):
     """ Initiates a handshake for a smart HTTP connection
 
     https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
@@ -414,15 +409,15 @@ def info_refs(request, user, project_name, access_token=None):
                            repository=requested_repo, data=None)
     return response.get_http_info_refs()
 
-# @git_access_required
-# @has_permission_to('read')
+@git_access_required
+@requires_permission_to('read')
 def upload_pack(request, user, project_name, access_token=None):
     """ Calls service_rpc assuming the user is authenicated and has read permissions """
 
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
-# @git_access_required
-# @has_permission_to('write')
+@git_access_required
+@requires_permission_to('write')
 def receive_pack(request, user, project_name, access_token=None):
     """ Calls service_rpc assuming the user is authenicated and has write permissions """
 

@@ -8,6 +8,8 @@ import requests
 import logging
 import base64
 import json
+import jwt
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -56,29 +58,6 @@ def basic_auth(authorization_header):
     else:
         return None
 
-def wevolver_auth(function):
-    """ Determines the user and authorization through Wevolver token based auth
-
-    Uses the request's access_token and user_id params to check the user's bearer
-    token against the Wevolver API
-    """
-
-    def wrap(request, *args, **kwargs):
-        headers = request.META.get('HTTP_AUTHORIZATION', None)
-        kwargs['access_token'] = headers
-        user = request.GET.get("user_id")
-        success, response = checktoken(user, kwargs['user'], kwargs['project_name'], headers)
-        if success:
-            kwargs['access_token'] = headers
-            return function(request, *args, **kwargs)
-        else:
-            raise PermissionDenied
-
-    wrap.__doc__ = function.__doc__
-    wrap.__name__ = function.__name__
-    return wrap
-
-# @profile(immediate=True)
 def checktoken(user, user_name, project_name, authorization):
     """ Checks against the Wevolver API to see if the users token is currently valid
 
@@ -92,8 +71,25 @@ def checktoken(user, user_name, project_name, authorization):
     response = requests.get(url, headers=headers)
     return (response.status_code == requests.codes.ok, response)
 
-def has_permission_to(permission):
-    """ Checks user's permission set for the requested project
+def gettoken(user_id, user_name, project_name, access_token):
+    url = "{}/users/{}/checktoken/?project={}/{}".format(settings.API_BASE, user_id, user_name, project_name)
+    access_token = access_token if access_token.split()[0] == "Bearer" else "Bearer " + access_token
+    headers = {'Authorization': '{}'.format(access_token)}
+    response = requests.get(url, headers=headers)
+    return (response.status_code == requests.codes.ok, response)
+
+def decode_token(token):
+    with open('versions/jwt.verify','r') as verify:
+        try:
+            return jwt.decode(token, verify.read(), algorithms=['RS256'], issuer='wevolver')
+        except jwt.ExpiredSignatureError as error:
+            print(error)
+
+def requires_permission_to(permission):
+    """ Determines the user and authorization through Wevolver token based auth
+
+    Uses the request's access_token and user_id params to check the user's bearer
+    token against the Wevolver API
 
     Calls the project permission endpoint with the current user's id to
     get a list of permissions based on their role
@@ -102,13 +98,29 @@ def has_permission_to(permission):
     def has_permission(func):
         @wraps(func)
         def _decorator(request, *args, **kwargs):
-            authorization = kwargs['access_token']
-            project_name = kwargs['project_name']
+            access_token = request.META.get('HTTP_AUTHORIZATION', None)
+            user_id = request.GET.get("user_id")
             user_name = kwargs['user']
-            code, response = checktoken(-1, user_name, project_name, authorization)
-            if permission in response.text:
+            project_name = kwargs['project_name']
+            permissions = request.META.get('HTTP_PERMISSIONS', None)
+
+            print(access_token)
+            print('permissions')
+            print(permissions)
+            if not permissions:
+                success, response = gettoken(user_id, user_name, project_name, access_token)
+                token = response.content
+                decoded_token = decode_token(token)
+                permissions = decoded_token['permissions']
+                print(decoded_token)
+            else:
+                token = permissions
+                permissions = decode_token(permissions)['permissions']
+
+            if permissions and permission in permissions:
+                kwargs['permissions_token'] = token
                 return func(request, *args, **kwargs)
             else:
-                return HttpResponseForbidden('Access forbidden.')
+                return HttpResponseForbidden('No Permissions')
         return _decorator
     return has_permission

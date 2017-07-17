@@ -14,6 +14,7 @@ COPY . /git_code
 RUN pip install sphinx
 RUN pip install sphinx_rtd_theme
 RUN pip install tokenlib
+RUN pip install cryptography
 RUN pip install pygit2
 RUN pip install django
 RUN pip install coveralls
@@ -22,6 +23,7 @@ RUN pip3 install django-cors-headers
 RUN pip install coverage
 RUN pip install coveralls
 RUN pip install tokenlib
+RUN pip install pyjwt
 RUN pip install profilehooks
 
 RUN ldconfig
