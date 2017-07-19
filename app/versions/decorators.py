@@ -120,6 +120,8 @@ def gettoken(user_id, user_name, project_name, access_token):
     access_token = access_token if access_token.split()[0] == "Bearer" else "Bearer " + access_token
     headers = {'Authorization': '{}'.format(access_token)}
     response = requests.get(url, headers=headers)
+    print('SUCCESS')
+    print(response.status_code)
     return (response.status_code == requests.codes.ok, response)
 
 def decode_token(token, user_id, user_name, project_name):
