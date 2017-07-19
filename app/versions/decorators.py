@@ -35,11 +35,20 @@ def requires_permission_to(permission):
             if not permissions:
                 success, response = gettoken(user_id, user_name, project_name, access_token)
                 token = response.content
-                decoded_token = decode_token(token, user_id, user_name, project_name, access_token)
+                decoded_token = decode_token(token, user_id, user_name, project_name)
                 permissions = decoded_token['permissions']
             else:
                 token = permissions
-                permissions = decode_token(token, user_id, user_name, project_name, access_token)['permissions']
+                permissions = decode_token(token, user_id, user_name, project_name)
+                print("The permission set {}".format(permissions))
+                if not permissions and access_token:
+                    success, response = gettoken(user_id, user_name, project_name, access_token)
+                    token = response.content
+                    permissions = decode_token(token, user_id, user_name, project_name)['permissions']
+                elif not permissions:
+                    permissions = ['none']
+                else:
+                    permissions = permissions['permissions']
             if permissions and permission in permissions:
                 kwargs['permissions_token'] = token
                 return func(request, *args, **kwargs)
@@ -113,14 +122,9 @@ def gettoken(user_id, user_name, project_name, access_token):
     response = requests.get(url, headers=headers)
     return (response.status_code == requests.codes.ok, response)
 
-def decode_token(token, user_id, user_name, project_name, access_token=None):
+def decode_token(token, user_id, user_name, project_name):
     with open('versions/jwt.verify','r') as verify:
         try:
             return jwt.decode(token, verify.read(), algorithms=['RS256'], issuer='wevolver')
         except jwt.ExpiredSignatureError as error:
-            success, response = gettoken(user_id, user_name, project_name, access_token)
-            token = response.content
-            print(str(token, 'utf-8'))
-            with open('versions/jwt.verify','r') as verify:
-                token = jwt.decode(str(token, 'utf-8'), verify.read(), algorithms=['RS256'], issuer='wevolver')
-                return token
+            return None
