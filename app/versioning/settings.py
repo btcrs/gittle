@@ -14,7 +14,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'ggec94x-e8!9pfqz2(ev32gxpq#w)81v4wa@cuc3tur77$s!1a'
 DEBUG = True
 
-ALLOWED_HOSTS = [ 'test.wevolver.com', 'dev.wevolver.com', 'localhost', '127.0.0.1', 'groot' ]
+ALLOWED_HOSTS = [ '*.wevolver.com', 'wevolver.com', 'test.wevolver.com', 'dev.wevolver.com', 'localhost', '127.0.0.1', 'groot' ]
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000
 
