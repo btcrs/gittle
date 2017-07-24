@@ -10,7 +10,7 @@
 
 
 ## Usage
-Install project requirements:
+Install local requirements:
 ```
 $ pip install -r requirements.txt
 ```
