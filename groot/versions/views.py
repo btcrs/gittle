@@ -1,18 +1,18 @@
-from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
-from versions.decorators import requires_git_permission_to, requires_permission_to
-from wsgiref.util import FileWrapper
-from versions.git import GitResponse
-from functools import wraps
-from urllib import parse
-from io import BytesIO
-from time import time
-from enum import Enum
-
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.http import StreamingHttpResponse
 from django.conf import settings
+
+from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
+from groot.versions.decorators import requires_git_permission_to, requires_permission_to
+from wsgiref.util import FileWrapper
+from groot.versions.git import GitResponse
+from functools import wraps
+from urllib import parse
+from io import BytesIO
+from time import time
+from enum import Enum
 
 import mimetypes
 import tokenlib
@@ -80,7 +80,6 @@ def download_file(request, user, project_name):
         response['Content-Disposition'] = "attachment; filename=%s" % path
         return response
 
-
 @requires_permission_to('read')
 def list_bom(request, user, project_name, permissions_token):
     directory = generate_directory(user)
@@ -95,8 +94,6 @@ def list_bom(request, user, project_name, permissions_token):
     else:
         response = HttpResponse('Failed')
     return response
-
-
 
 @require_http_methods(["POST"])
 def login(request):
@@ -208,7 +205,6 @@ def walk_tree(repo, full_path):
             current_object = temp_object
     return current_object, blob
 
-
 @requires_permission_to('read')
 def show_file(request, user, project_name, permissions_token):
     """ Grabs and returns a single file or a tree from a user's repository
@@ -285,7 +281,6 @@ def commit_blob(repo, blob, path, name='readme.md'):
     if newTree:
         commit_tree(repo, newTree)
 
-
 @require_http_methods(["POST"])
 @requires_permission_to("write")
 def create_new_folder(request, user, project_name, permissions_token):
@@ -309,7 +304,6 @@ def create_new_folder(request, user, project_name, permissions_token):
     response = JsonResponse({'message': 'Folder Created'})
     response['Permissions'] = permissions_token
     return response
-
 
 @require_http_methods(["POST"])
 @requires_permission_to("write")
@@ -340,7 +334,6 @@ def upload_file(request, user, project_name, permissions_token):
     response = JsonResponse({'message': 'Files uploaded'})
     response['Permissions'] = permissions_token
     return response
-
 
 @requires_permission_to('read')
 def get_archive_token(request, user, project_name, permissions_token):
@@ -386,7 +379,6 @@ def download_archive(request, user, project_name):
             return response
     else:
         raise PermissionDenied
-
 
 @requires_git_permission_to('read')
 def info_refs(request, user, project_name):

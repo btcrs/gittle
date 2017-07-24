@@ -45,7 +45,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'versioning.urls'
+ROOT_URLCONF = 'groot.urls'
 
 TEMPLATES = [
     {
@@ -64,7 +64,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'versioning.wsgi.application'
+WSGI_APPLICATION = 'groot.wsgi.application'
 
 DATABASES = {
     'default': {
@@ -145,19 +145,19 @@ LOGGING = {
     }
 }
 
-with open("secrets.json") as f:
-    secrets = json.loads(f.read())
+with open("env.json") as f:
+    environment = json.loads(f.read())
 
-def get_secret(setting, secrets=secrets):
-    """Get the secret variable or return explicit exception."""
+def get_env(setting, env=environment):
+    """Get the env variable or return explicit exception."""
     try:
-        return secrets[setting]
+        return env[setting]
     except KeyError:
         error_msg = "Set the {0} environment variable".format(setting)
         raise ImproperlyConfigured(error_msg)
 
-API_BASE = get_secret("API_BASE")
-AUTH_BASE = get_secret("AUTH_BASE")
-TEST_API_BASE = get_secret("TEST_API_BASE")
-TEST_AUTH_BASE = get_secret("TEST_AUTH_BASE")
-TOKEN_SECRET = get_secret("TOKEN_SECRET")
+API_BASE = get_env("API_BASE")
+AUTH_BASE = get_env("AUTH_BASE")
+TEST_API_BASE = get_env("TEST_API_BASE")
+TEST_AUTH_BASE = get_env("TEST_AUTH_BASE")
+TOKEN_SECRET = get_env("TOKEN_SECRET")
