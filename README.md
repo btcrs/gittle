@@ -6,12 +6,19 @@
 > A git server
 
 ## Installation
+This project uses Python 3. [Install Python 3.](http://python-guide-pt-br.readthedocs.io/en/latest/starting/installation/)
 
+This project uses libgit2, a portable, pure C implementation of the Git core methods. [Install libgit2.](https://github.com/libgit2/libgit2)
+
+Install project requirements:
+```
+$ pip install -r requirements.txt
+```
 
 ## Usage
 
 ```
-./run.sh runserver
+ptyhon manage runserver
 ```
 ## Contributing
 
