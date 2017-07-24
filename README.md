@@ -19,7 +19,7 @@ The main purpose of this repository is to continue to evolve Groot, making it fa
 
 ### Code of Conduct
 
-Facebook has adopted a Code of Conduct that we expect project participants to adhere to. Please read the full text so that you can understand what actions will and will not be tolerated.
+Wevolver has adopted a Code of Conduct that we expect project participants to adhere to. Please read the full text so that you can understand what actions will and will not be tolerated.
 
 ### Contributing Guide
 
