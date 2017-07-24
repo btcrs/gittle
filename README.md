@@ -5,10 +5,11 @@
 
 > A git server
 
-## Requirements
-* [Python 3.](http://python-guide-pt-br.readthedocs.io/en/latest/starting/installation/)
+## Installation Requirements
 
-* [Install libgit2.](https://github.com/libgit2/libgit2) - A portable, pure C implementation of the Git core methods.
+* [Python 3](http://python-guide-pt-br.readthedocs.io/en/latest/starting/installation/) - Groot requires python 3.6 or newer.
+
+* [libgit2](https://github.com/libgit2/libgit2) - A portable, pure C implementation of the Git core methods.
 
 
 ## Usage
@@ -19,7 +20,7 @@ $ pip install -r requirements.txt
 
 Run the server:
 ```
-$ python manage runserver
+$ python manage.py runserver
 ```
 ## Contributing
 
