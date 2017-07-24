@@ -2,9 +2,6 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/btcrs/groot/badge.svg?branch=upload-testing)](https://coveralls.io/github/btcrs/groot?branch=master) [![Build Status](https://travis-ci.org/btcrs/groot.svg?branch=master)](https://travis-ci.org/btcrs/groot)
 
-
-> A git server
-
 ## Installation Requirements
 
 * [Python 3](http://python-guide-pt-br.readthedocs.io/en/latest/starting/installation/) - Groot requires python 3.6 or newer.
