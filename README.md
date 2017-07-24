@@ -19,6 +19,13 @@ Run the server:
 ```
 $ python manage.py runserver
 ```
+
+## Examples
+Creating  repo:
+
+Cloning a repo:
+
+
 ## Contributing
 
 The main purpose of this repository is to continue to evolve Groot, making it faster, more powerful and easier to use.
