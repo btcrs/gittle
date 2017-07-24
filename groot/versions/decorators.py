@@ -26,6 +26,10 @@ def requires_permission_to(permission):
     def has_permission(func):
         @wraps(func)
         def _decorator(request, *args, **kwargs):
+            if settings.DEBUG:
+                kwargs['permissions_token'] = "All Good"
+                return func(request, *args, **kwargs)
+
             access_token = request.META.get('HTTP_AUTHORIZATION', None)
             permissions = request.META.get('HTTP_PERMISSIONS', None)
             permissions = permissions if permissions else request.GET.get("permissions")
@@ -66,6 +70,8 @@ def requires_git_permission_to(permission):
     def has_git_permission(func):
         @wraps(func)
         def _decorator(request, *args, **kwargs):
+            if settings.DEBUG:
+                return func(request, *args, **kwargs)
             if request.META.get('HTTP_AUTHORIZATION'):
                 access_token, user_id = basic_auth(request.META['HTTP_AUTHORIZATION'])
                 user_name = kwargs['user']
