@@ -4,9 +4,9 @@
 
 ## Installation Requirements
 
-* [Python 3](http://python-guide-pt-br.readthedocs.io/en/latest/starting/installation/) - Groot requires python 3.6 or newer.
-
-* [libgit2](https://github.com/libgit2/libgit2) - A portable, pure C implementation of the Git core methods.
+* [Python 3](http://python-guide-pt-br.readthedocs.io/en/latest/starting/installation/) - Requires python 3.6 or newer.
+* [Git](https://git-scm.com/downloads) - The latest version.
+* [libgit2](https://github.com/libgit2/libgit2) - Latest version. Libgit2 is a portable, pure C implementation of the Git core methods.
 
 
 ## Usage
@@ -26,7 +26,7 @@ Creating  repo:
 Cloning a repo:
 
 
-## Contributing
+<!--## Contributing
 
 The main purpose of this repository is to continue to evolve Groot, making it faster, more powerful and easier to use.
 
@@ -41,12 +41,11 @@ Read our contributing guide to learn about our development process, how to propo
 
 ### Beginer friendly features and bugs
 
-To help you get your feet wet and get you familiar with our contribution process, we have a list of beginner friendly bugs that contain bugs which are fairly easy to fix. This is a great place to get started.
+To help you get your feet wet and get you familiar with our contribution process, we have a list of beginner friendly bugs that contain bugs which are fairly easy to fix. This is a great place to get started.-->
 
 ## Maintainers
 
-[@btcrs](https://github.com/btcrs)
+[@wevolver](https://github.com/wevolver)
 
 ## License
-
-MIT © 2017 Wevolver
+© 2017 Wevolver
