@@ -4,11 +4,14 @@ from django.http import HttpResponse, JsonResponse
 from django.http import StreamingHttpResponse
 from django.conf import settings
 
-from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
-from groot.versions.decorators import requires_git_permission_to, requires_permission_to
-from wsgiref.util import FileWrapper
+from groot.permissions.decorators import requires_git_permission_to
+from groot.permissions.decorators import requires_permission_to
 from groot.versions.git import GitResponse
-# from urllib import parse
+from wsgiref.util import FileWrapper
+from pygit2 import GIT_FILEMODE_TREE
+from pygit2 import GIT_FILEMODE_BLOB
+from pygit2 import Repository
+from pygit2 import Signature
 from io import BytesIO
 from time import time
 from enum import Enum
@@ -24,8 +27,6 @@ import base64
 import pygit2
 import shutil
 import json
-import csv
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -33,92 +34,7 @@ class Actions(Enum):
     advertisement = 'advertisement'
     result = 'result'
 
-def flatten(tree, repo):
-    flattened = []
-    for entry in tree:
-        if entry.type == 'tree':
-            flattened.extend(flatten(repo[entry.id], repo))
-        else:
-            flattened.append(entry)
-    return flattened
-
-@requires_permission_to('read')
-def read_file(request, user, project_name, permissions_token):
-    path = request.GET.get('path').rstrip('/')
-    directory = generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory)):
-        repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
-        git_tree, git_blob = walk_tree(repo, path)
-        parsed_file = None
-        if type(git_blob) == pygit2.Blob:
-            parsed_file = str(base64.b64encode(git_blob.data), 'utf-8')
-        chunk_size = 8192
-        filelike = FileWrapper(BytesIO(git_blob.data), chunk_size)
-        response = StreamingHttpResponse(filelike,
-                               content_type=mimetypes.guess_type(path)[0])
-        response['Content-Length'] = len(git_blob.data)
-        response['Permissions'] = permissions_token
-
-        # for download needs and argument in the call
-        # response['Content-Disposition'] = "attachment; filename=%s" % path
-        return response
-
-@requires_permission_to('read')
-def list_bom(request, user, project_name, permissions_token):
-    directory = generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory)):
-        repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
-        tree = (repo.revparse_single('master').tree)
-        blobs = flatten(tree, repo)
-        data = ''
-        for b in [blob for blob in blobs if blob.name == 'bom.csv']:
-            data += str(repo[b.id].data, 'utf-8')
-        response = HttpResponse(data)
-    else:
-        response = HttpResponse('Failed')
-    return response
-
 @require_http_methods(["POST"])
-def login(request):
-    """ Logs the user in and sets the token
-
-    Returns:
-        HttpResponse: An object containing all session metadata
-    """
-    post = json.loads(request.body)
-    body = {'username': post['username'], 'password': post['password'], 'grant_type': 'password'}
-    url = "{}/proxy-client-token".format(settings.AUTH_BASE)
-    response = requests.post(url, data=body)
-    return HttpResponse(response.text)
-
-def generate_directory(username):
-    """ Generates a unique directory structure for the project
-
-    https://github.com/blog/117-scaling-lesson-23742
-
-    Returns:
-        Path (str): The unique path as a string
-    """
-    hash = hashlib.md5();
-    hash.update(username.encode('utf-8'))
-    hash = hash.hexdigest()
-    a, b, c, d, *rest= hash[0], hash[1:3], hash[3:5], hash[5:7]
-    return os.path.join(a, b, c, d, username)
-
-def parse_file_tree(tree):
-    """ Parses the repository's tree structure
-
-    Returns a list of objects and metadata in the top level of the provided tree
-
-    Args:
-        tree (Tree): The most recent commit tree.
-
-    Returns:
-        dict: A list of all files in the top level of the provided tree.
-    """
-
-    return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
-
 @requires_permission_to("create")
 def create_project(request, user, project_name, permissions_token):
     """ Creates a bare repository with the provided name
@@ -153,6 +69,7 @@ def create_project(request, user, project_name, permissions_token):
 
     return HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
 
+@require_http_methods(["POST"])
 @requires_permission_to('write')
 def delete_project(request, user, project_name, permissions_token):
     """ Deletes the repository with the provided name
@@ -173,96 +90,27 @@ def delete_project(request, user, project_name, permissions_token):
     response['Permissions'] = permissions_token
     return response
 
-def walk_tree(repo, full_path):
-    current_object = repo.revparse_single('master').tree
-    locations = full_path.split('/')
-    if locations[0] == "":
-        locations = []
-    blob = None
-    for location in locations:
-        next_object = current_object.__getitem__(location)
-        temp_object = current_object
-        current_object = repo.get(next_object.id)
-        if type(current_object) == pygit2.Blob:
-            blob = current_object
-            current_object = temp_object
-    return current_object, blob
-
+@require_http_methods(["GET"])
 @requires_permission_to('read')
-def read_tree(request, user, project_name, permissions_token):
-    """ Grabs and returns a single file or a tree from a user's repository
-
-    if the requested object is a tree the function parses it intstead
-    of returning blindly.
-
-    Args:
-        user (string): The user's name.
-        project_name (string): The user's repository name.
-        oid (string): The hash of the blob.
-
-    Returns:
-        JsonResponse: An object with the requested file's data
-    """
+def read_file(request, user, project_name, permissions_token):
     path = request.GET.get('path').rstrip('/')
     directory = generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
         git_tree, git_blob = walk_tree(repo, path)
-        parsed_tree = None
         parsed_file = None
-        if type(git_tree) == pygit2.Tree:
-            parsed_tree = parse_file_tree(git_tree)
         if type(git_blob) == pygit2.Blob:
             parsed_file = str(base64.b64encode(git_blob.data), 'utf-8')
+        chunk_size = 8192
+        filelike = FileWrapper(BytesIO(git_blob.data), chunk_size)
+        response = StreamingHttpResponse(filelike,
+                               content_type=mimetypes.guess_type(path)[0])
+        response['Content-Length'] = len(git_blob.data)
+        response['Permissions'] = permissions_token
 
-        response = JsonResponse({'file': parsed_file, 'tree': parsed_tree})
-    else:
-        response = JsonResponse({'file': 'None', 'tree': 'None'})
-    response['Permissions'] = permissions_token
-    return response
-
-def add_blobs_to_tree(previous_commit_tree, repo, blobs, path):
-    current_tree = previous_commit_tree
-    trees = []
-
-    if path[0] != '':
-        for location in path:
-            try:
-                next_tree_entry = current_tree.__getitem__(location)
-                current_tree = repo.get(next_tree_entry.id)
-            except:
-                current_tree = False
-            trees.append(current_tree)
-
-        is_tree = trees[-1]
-        current_tree_builder = repo.TreeBuilder(trees[-1]) if is_tree else repo.TreeBuilder()
-        for blob, name in blobs:
-            current_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
-
-        for index in range(len(path) - 1, 0, -1):
-            previous_tree_builder = current_tree_builder
-            is_tree = trees[index - 1]
-            current_tree_builder = repo.TreeBuilder(is_tree) if is_tree else repo.TreeBuilder()
-            current_tree_builder.insert(path[index], previous_tree_builder.write(), GIT_FILEMODE_TREE)
-
-        previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
-        previous_commit_tree_builder.insert(path[0], current_tree_builder.write(), GIT_FILEMODE_TREE)
-        return previous_commit_tree_builder.write()
-    else:
-        previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
-        for blob, name in blobs:
-            previous_commit_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
-        return previous_commit_tree_builder.write()
-
-def commit_tree(repo, newTree):
-    signature = Signature('Tester', 'test@example.com', int(time()), 0)
-    commit = repo.create_commit(repo.head.name, signature, signature, 'Test commit with pygit2', newTree, [repo.head.peel().id])
-
-def commit_blob(repo, blob, path, name='readme.md'):
-    previous_commit_tree = repo.revparse_single('master').tree
-    newTree = add_blobs_to_tree(previous_commit_tree, repo, [(blob, name)], path)
-    if newTree:
-        commit_tree(repo, newTree)
+        # for download needs and argument in the call
+        # response['Content-Disposition'] = "attachment; filename=%s" % path
+        return response
 
 @require_http_methods(["POST"])
 @requires_permission_to("write")
@@ -318,6 +166,23 @@ def upload_files(request, user, project_name, permissions_token):
     response['Permissions'] = permissions_token
     return response
 
+@require_http_methods(["GET"])
+@requires_permission_to('read')
+def list_bom(request, user, project_name, permissions_token):
+    directory = generate_directory(user)
+    if os.path.exists(os.path.join('./repos', directory)):
+        repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
+        tree = (repo.revparse_single('master').tree)
+        blobs = flatten(tree, repo)
+        data = ''
+        for b in [blob for blob in blobs if blob.name == 'bom.csv']:
+            data += str(repo[b.id].data, 'utf-8')
+        response = HttpResponse(data)
+    else:
+        response = HttpResponse('Failed')
+    return response
+
+@require_http_methods(["GET"])
 @requires_permission_to('read')
 def get_archive_token(request, user, project_name, permissions_token):
     """ Return a fast expiration token to allow downlaod of archive
@@ -363,6 +228,7 @@ def download_archive(request, user, project_name):
     else:
         raise PermissionDenied
 
+@require_http_methods(["GET"])
 @requires_git_permission_to('read')
 def info_refs(request, user, project_name):
     """ Initiates a handshake for a smart HTTP connection
@@ -413,3 +279,133 @@ def service_rpc(user, project_name, request_service, request_body):
     response = GitResponse(service=request_service, action=Actions.result.value,
                            repository=requested_repo, data=request_body)
     return response.get_http_service_rpc()
+
+@require_http_methods(["GET"])
+@requires_permission_to('read')
+def read_tree(request, user, project_name, permissions_token):
+    """ Grabs and returns a single file or a tree from a user's repository
+
+    if the requested object is a tree the function parses it intstead
+    of returning blindly.
+
+    Args:
+        user (string): The user's name.
+        project_name (string): The user's repository name.
+        oid (string): The hash of the blob.
+
+    Returns:
+        JsonResponse: An object with the requested file's data
+    """
+    path = request.GET.get('path').rstrip('/')
+    directory = generate_directory(user)
+    if os.path.exists(os.path.join('./repos', directory)):
+        repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
+        git_tree, git_blob = walk_tree(repo, path)
+        parsed_tree = None
+        parsed_file = None
+        if type(git_tree) == pygit2.Tree:
+            parsed_tree = parse_file_tree(git_tree)
+        if type(git_blob) == pygit2.Blob:
+            parsed_file = str(base64.b64encode(git_blob.data), 'utf-8')
+
+        response = JsonResponse({'file': parsed_file, 'tree': parsed_tree})
+    else:
+        response = JsonResponse({'file': 'None', 'tree': 'None'})
+    response['Permissions'] = permissions_token
+    return response
+
+def generate_directory(username):
+    """ Generates a unique directory structure for the project
+
+    https://github.com/blog/117-scaling-lesson-23742
+
+    Returns:
+        Path (str): The unique path as a string
+    """
+    hash = hashlib.md5();
+    hash.update(username.encode('utf-8'))
+    hash = hash.hexdigest()
+    a, b, c, d, *rest= hash[0], hash[1:3], hash[3:5], hash[5:7]
+    return os.path.join(a, b, c, d, username)
+
+def parse_file_tree(tree):
+    """ Parses the repository's tree structure
+
+    Returns a list of objects and metadata in the top level of the provided tree
+
+    Args:
+        tree (Tree): The most recent commit tree.
+
+    Returns:
+        dict: A list of all files in the top level of the provided tree.
+    """
+
+    return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
+
+
+def walk_tree(repo, full_path):
+    current_object = repo.revparse_single('master').tree
+    locations = full_path.split('/')
+    if locations[0] == "":
+        locations = []
+    blob = None
+    for location in locations:
+        next_object = current_object.__getitem__(location)
+        temp_object = current_object
+        current_object = repo.get(next_object.id)
+        if type(current_object) == pygit2.Blob:
+            blob = current_object
+            current_object = temp_object
+    return current_object, blob
+
+def add_blobs_to_tree(previous_commit_tree, repo, blobs, path):
+    current_tree = previous_commit_tree
+    trees = []
+
+    if path[0] != '':
+        for location in path:
+            try:
+                next_tree_entry = current_tree.__getitem__(location)
+                current_tree = repo.get(next_tree_entry.id)
+            except:
+                current_tree = False
+            trees.append(current_tree)
+
+        is_tree = trees[-1]
+        current_tree_builder = repo.TreeBuilder(trees[-1]) if is_tree else repo.TreeBuilder()
+        for blob, name in blobs:
+            current_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
+
+        for index in range(len(path) - 1, 0, -1):
+            previous_tree_builder = current_tree_builder
+            is_tree = trees[index - 1]
+            current_tree_builder = repo.TreeBuilder(is_tree) if is_tree else repo.TreeBuilder()
+            current_tree_builder.insert(path[index], previous_tree_builder.write(), GIT_FILEMODE_TREE)
+
+        previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
+        previous_commit_tree_builder.insert(path[0], current_tree_builder.write(), GIT_FILEMODE_TREE)
+        return previous_commit_tree_builder.write()
+    else:
+        previous_commit_tree_builder = repo.TreeBuilder(previous_commit_tree)
+        for blob, name in blobs:
+            previous_commit_tree_builder.insert(name, blob, GIT_FILEMODE_BLOB)
+        return previous_commit_tree_builder.write()
+
+def commit_blob(repo, blob, path, name='readme.md'):
+    previous_commit_tree = repo.revparse_single('master').tree
+    newTree = add_blobs_to_tree(previous_commit_tree, repo, [(blob, name)], path)
+    if newTree:
+        commit_tree(repo, newTree)
+
+def commit_tree(repo, newTree):
+    signature = Signature('Tester', 'test@example.com', int(time()), 0)
+    commit = repo.create_commit(repo.head.name, signature, signature, 'Test commit with pygit2', newTree, [repo.head.peel().id])
+
+def flatten(tree, repo):
+    flattened = []
+    for entry in tree:
+        if entry.type == 'tree':
+            flattened.extend(flatten(repo[entry.id], repo))
+        else:
+            flattened.append(entry)
+    return flattened
