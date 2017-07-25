@@ -2,6 +2,7 @@ from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.http import StreamingHttpResponse
+from django.http import HttpResponseBadRequest
 from django.conf import settings
 
 from groot.permissions.decorators import requires_git_permission_to
@@ -150,7 +151,11 @@ def upload_files(request, user, project_name, permissions_token):
     """
     directory = generate_directory(user)
     path = request.GET.get('path').rstrip('/')
-    repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
+
+    try:
+        repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
+    except err:
+        return HttpResponseBadRequest('Repo does not exist.')
 
     if request.FILES:
         old_commit_tree = repo.revparse_single('master').tree
@@ -161,8 +166,10 @@ def upload_files(request, user, project_name, permissions_token):
 
         new_commit_tree = add_blobs_to_tree(old_commit_tree, repo, blobs, path.split('/'))
         commit_tree(repo, new_commit_tree)
+        response = JsonResponse({'message': 'Files uploaded'})
+    else:
+        response = HttpResponseBadRequest('No files sent.')
 
-    response = JsonResponse({'message': 'Files uploaded'})
     response['Permissions'] = permissions_token
     return response
 
