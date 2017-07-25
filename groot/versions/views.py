@@ -8,8 +8,7 @@ from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature
 from groot.versions.decorators import requires_git_permission_to, requires_permission_to
 from wsgiref.util import FileWrapper
 from groot.versions.git import GitResponse
-from functools import wraps
-from urllib import parse
+# from urllib import parse
 from io import BytesIO
 from time import time
 from enum import Enum
@@ -23,7 +22,6 @@ import tarfile
 import hashlib
 import base64
 import pygit2
-import urllib
 import shutil
 import json
 import csv
@@ -45,7 +43,7 @@ def flatten(tree, repo):
     return flattened
 
 @requires_permission_to('read')
-def render_file(request, user, project_name, permissions_token):
+def read_file(request, user, project_name, permissions_token):
     path = request.GET.get('path').rstrip('/')
     directory = generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
@@ -60,24 +58,9 @@ def render_file(request, user, project_name, permissions_token):
                                content_type=mimetypes.guess_type(path)[0])
         response['Content-Length'] = len(git_blob.data)
         response['Permissions'] = permissions_token
-        # response['Content-Disposition'] = "attachment; filename=%s" % path
-        return response
 
-def download_file(request, user, project_name):
-    path = request.GET.get('path').rstrip('/')
-    directory = generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory)):
-        repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
-        git_tree, git_blob = walk_tree(repo, path)
-        parsed_file = None
-        if type(git_blob) == pygit2.Blob:
-            parsed_file = str(base64.b64encode(git_blob.data), 'utf-8')
-        chunk_size = 8192
-        filelike = FileWrapper(BytesIO(git_blob.data), chunk_size)
-        response = StreamingHttpResponse(filelike,
-                               content_type=mimetypes.guess_type(path)[0])
-        response['Content-Length'] = len(git_blob.data)
-        response['Content-Disposition'] = "attachment; filename=%s" % path
+        # for download needs and argument in the call
+        # response['Content-Disposition'] = "attachment; filename=%s" % path
         return response
 
 @requires_permission_to('read')
@@ -137,7 +120,7 @@ def parse_file_tree(tree):
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
 @requires_permission_to("create")
-def create(request, user, project_name, permissions_token):
+def create_project(request, user, project_name, permissions_token):
     """ Creates a bare repository with the provided name
 
     Args:
@@ -171,7 +154,7 @@ def create(request, user, project_name, permissions_token):
     return HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
 
 @requires_permission_to('write')
-def delete(request, user, project_name, permissions_token):
+def delete_project(request, user, project_name, permissions_token):
     """ Deletes the repository with the provided name
 
     Args:
@@ -206,7 +189,7 @@ def walk_tree(repo, full_path):
     return current_object, blob
 
 @requires_permission_to('read')
-def show_file(request, user, project_name, permissions_token):
+def read_tree(request, user, project_name, permissions_token):
     """ Grabs and returns a single file or a tree from a user's repository
 
     if the requested object is a tree the function parses it intstead
@@ -307,8 +290,8 @@ def create_new_folder(request, user, project_name, permissions_token):
 
 @require_http_methods(["POST"])
 @requires_permission_to("write")
-def upload_file(request, user, project_name, permissions_token):
-    """ Uploads and commits a single file to a specific path in a user's repository
+def upload_files(request, user, project_name, permissions_token):
+    """ Uploads and commits a list of files to a specific path in a user's repository tree§
 
     Args:
         user (string): The user's name.
