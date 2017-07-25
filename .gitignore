@@ -8,3 +8,5 @@ logs/*
 /test
 __pycache__
 dd.sqlite3
+
+run\.sh
