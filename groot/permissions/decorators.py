@@ -22,7 +22,6 @@ def requires_permission_to(permission):
     Calls the project permission endpoint with the current user's id to
     get a list of permissions based on their role
     """
-    # @profile(immediate=True)
     def has_permission(func):
         @wraps(func)
         def _decorator(request, *args, **kwargs):
@@ -126,11 +125,17 @@ def get_token(user_id, user_name, project_name, access_token):
     access_token = access_token if access_token.split()[0] == "Bearer" else "Bearer " + access_token
     headers = {'Authorization': '{}'.format(access_token)}
     response = requests.get(url, headers=headers)
-    print('SUCCESS')
-    print(response.status_code)
     return (response.status_code == requests.codes.ok, response)
 
 def decode_token(token, user_id, user_name, project_name):
+    """ Decodes the received token using Wevolvers JWT public key
+
+    Args:
+        token (str): the received token
+        user_id (str): the current requesting user's id
+        user_name (str): the current requesting user
+        user_name (str): the current requesting user's project
+    """
     with open('versions/jwt.verify','r') as verify:
         try:
             return jwt.decode(token, verify.read(), algorithms=['RS256'], issuer='wevolver')

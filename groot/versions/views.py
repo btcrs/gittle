@@ -8,11 +8,11 @@ from django.conf import settings
 from groot.permissions import decorators as permissions
 from groot.versions import porcelain
 from groot.versions.git import GitResponse
+
 from wsgiref.util import FileWrapper
 from io import BytesIO
 from time import time
 from enum import Enum
-
 import mimetypes
 import tokenlib
 import logging

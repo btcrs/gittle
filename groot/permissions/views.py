@@ -9,7 +9,10 @@ logger = logging.getLogger(__name__)
 
 @require_http_methods(["POST"])
 def login(request):
-    """ Logs the user in and sets the token
+    """ Requests a client_token from the Wevolver Auth application
+
+    Using the requesting user's username and password, we send a authorization
+    request to the login endpoint Wevolver's authenication/authorization (/o) API.
 
     Returns:
         HttpResponse: An object containing all session metadata
