@@ -5,7 +5,7 @@
 ## Installation Requirements
 
 * [Python 3](http://python-guide-pt-br.readthedocs.io/en/latest/starting/installation/) - Requires python 3.6 or newer.
-* [Git](https://git-scm.com/downloads) - The latest version.
+* [Git](https://git-scm.com/downloads) - Latest version.
 * [libgit2](https://github.com/libgit2/libgit2) - Latest version. Libgit2 is a portable, pure C implementation of the Git core methods.
 
 
