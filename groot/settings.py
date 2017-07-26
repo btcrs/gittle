@@ -23,10 +23,10 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000
 INSTALLED_APPS = (
     'robots',
     'corsheaders',
-    # 'django.contrib.sites',
+    'django.contrib.sites',
     # 'django.contrib.admin',
     # 'django.contrib.auth',
-    # 'django.contrib.contenttypes',
+    'django.contrib.contenttypes',
     # 'django.contrib.sessions',
     # 'django.contrib.messages',
     # 'django.contrib.staticfiles',
