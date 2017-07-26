@@ -172,14 +172,14 @@ def receive_files(request, user, project_name, permissions_token):
         return HttpResponseBadRequest('Repo does not exist.')
 
     if request.FILES:
-        old_porcelain.commit_tree = repo.revparse_single('master').tree
+        old_commit_tree = repo.revparse_single('master').tree
         blobs = []
         for key, file in request.FILES.items():
             blob = repo.create_blob(file.read())
             blobs.append((blob, file.name))
 
-        new_porcelain.commit_tree = porcelain.add_blobs_to_tree(old_porcelain.commit_tree, repo, blobs, path.split('/'))
-        porcelain.commit_tree(repo, new_porcelain.commit_tree)
+        new_commit_tree = porcelain.add_blobs_to_tree(old_commit_tree, repo, blobs, path.split('/'))
+        porcelain.commit_tree(repo, new_commit_tree)
         response = JsonResponse({'message': 'Files uploaded'})
     else:
         response = HttpResponseBadRequest('No files sent.')
