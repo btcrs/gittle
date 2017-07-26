@@ -35,7 +35,7 @@ def create_project(request, user, project_name, permissions_token):
     """ Creates a bare repository (project) based on the user name
         and project name in the URL.
 
-        It generates a unique path based on the user name and 
+        It generates a unique path based on the user name and
         project, creates a default readme and commits it.
 
     Args:
@@ -219,24 +219,6 @@ def list_bom(request, user, project_name, permissions_token):
 
 @require_http_methods(["GET"])
 @permissions.requires_permission_to('read')
-def get_archive_token(request, user, project_name, permissions_token):
-    """ Return a fast expiration token to allow download of archive
-
-    Args:
-        user (string): The user's name.
-        project_name (string): The user's repository name.
-        permissions_token (string): JWT token signed by Wevolver.
-
-    Returns:
-        JsonResponse: An object with the archive download token
-    """
-
-    token = tokenlib.make_token({"project_name": project_name}, timeout=1, secret=settings.TOKEN_SECRET)
-    response = JsonResponse({'token': token})
-    response['Permissions'] = permissions_token
-    return response
-
-@require_http_methods(["GET"])
 def download_archive(request, user, project_name):
     """ Grabs and returns a user's repository as a tarball.
 
@@ -247,24 +229,16 @@ def download_archive(request, user, project_name):
     Returns:
         JsonResponse: An object with the requested user's repository as a tarball.
     """
-    token = request.GET.get("token")
-    if token:
-        try:
-            parsed_token = tokenlib.parse_token(token, secret=settings.TOKEN_SECRET)
-        except:
-            raise PermissionDenied
-        else:
-            filename = project_name + '.tar'
-            response = HttpResponse(content_type='application/x-gzip')
-            response['Content-Disposition'] = 'attachment; filename=' + filename
 
-            directory = porcelain.generate_directory(user)
-            with tarfile.open(fileobj=response, mode='w') as archive:
-                repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-                repo.write_archive(repo.head.target, archive)
-            return response
-    else:
-        raise PermissionDenied
+    filename = project_name + '.tar'
+    response = HttpResponse(content_type='application/x-gzip')
+    response['Content-Disposition'] = 'attachment; filename=' + filename
+
+    directory = porcelain.generate_directory(user)
+    with tarfile.open(fileobj=response, mode='w') as archive:
+        repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
+        repo.write_archive(repo.head.target, archive)
+    return response
 
 @require_http_methods(["GET"])
 @permissions.requires_git_permission_to('read')
