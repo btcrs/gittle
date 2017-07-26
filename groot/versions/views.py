@@ -32,11 +32,16 @@ class Actions(Enum):
 @require_http_methods(["POST"])
 @permissions.requires_permission_to("create")
 def create_project(request, user, project_name, permissions_token):
-    """ Creates a bare repository with the provided name
+    """ Creates a bare repository (project) based on the user name
+        and project name in the URL.
+
+        It generates a unique path based on the user name and 
+        project, creates a default readme and commits it.
 
     Args:
         user (string): The user's name.
         project_name (string): The user's repository name.
+        permissions_token (string): JWT token signed by Wevolver.
 
     Returns:
         HttpResponse: A message indicating the success or failure of the create
@@ -67,11 +72,12 @@ def create_project(request, user, project_name, permissions_token):
 @require_http_methods(["POST"])
 @permissions.requires_permission_to('write')
 def delete_project(request, user, project_name, permissions_token):
-    """ Deletes the repository with the provided name
+    """ Finds the repository specified in the URL and deletes from the file system.
 
     Args:
         user (string): The user's name.
         project_name (string): The user's repository name.
+        permissions_token (string): JWT token signed by Wevolver.
 
     Returns:
         HttpResponse: A message indicating the success or failure of the delete
@@ -88,6 +94,18 @@ def delete_project(request, user, project_name, permissions_token):
 @require_http_methods(["GET"])
 @permissions.requires_permission_to('read')
 def read_file(request, user, project_name, permissions_token):
+    """ Finds a file in the path of the repository specified by the URL
+        and returns the blob.
+
+    Args:
+        user (string): The user's name.
+        project_name (string): The user's repository name.
+        permissions_token (string): JWT token signed by Wevolver.
+
+    Returns:
+        StreamingHttpResponse: The file's raw data.
+    """
+
     path = request.GET.get('path').rstrip('/')
     directory = porcelain.generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
@@ -110,11 +128,12 @@ def read_file(request, user, project_name, permissions_token):
 @require_http_methods(["POST"])
 @permissions.requires_permission_to("write")
 def create_new_folder(request, user, project_name, permissions_token):
-    """ Commits a single file to a specific path to create new folder in tree
+    """ Commits a single file to a specified path, creating a new folder in the repository.
 
     Args:
         user (string): The user's name.
         project_name (string): The user's repository name.
+        permissions_token (string): JWT token signed by Wevolver.
 
     Returns:
         JsonResponse: An object
@@ -133,12 +152,13 @@ def create_new_folder(request, user, project_name, permissions_token):
 
 @require_http_methods(["POST"])
 @permissions.requires_permission_to("write")
-def upload_files(request, user, project_name, permissions_token):
-    """ Uploads and commits a list of files to a specific path in a user's repository tree§
+def receive_files(request, user, project_name, permissions_token):
+    """ Receives and commits an array of files to a specific path in the repository.
 
     Args:
         user (string): The user's name.
         project_name (string): The user's repository name.
+        permissions_token (string): JWT token signed by Wevolver.
 
     Returns:
         JsonResponse: An object
@@ -170,6 +190,20 @@ def upload_files(request, user, project_name, permissions_token):
 @require_http_methods(["GET"])
 @permissions.requires_permission_to('read')
 def list_bom(request, user, project_name, permissions_token):
+    """ Collects all the bom.csv files in a repository and return their sum.
+
+        Flattens the repository's tree into an array. Then filters the array for 'bom.csv',
+        concatenates them and returns unique lines.
+
+    Args:
+        user (string): The user's name.
+        project_name (string): The user's repository name.
+        permissions_token (string): JWT token signed by Wevolver.
+
+    Returns:
+        HttpResponse: The full Bill of Materials (BOM)
+    """
+
     directory = porcelain.generate_directory(user)
     if os.path.exists(os.path.join('./repos', directory)):
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
@@ -186,29 +220,32 @@ def list_bom(request, user, project_name, permissions_token):
 @require_http_methods(["GET"])
 @permissions.requires_permission_to('read')
 def get_archive_token(request, user, project_name, permissions_token):
-    """ Return a fast expiration token to allow downlaod of archive
+    """ Return a fast expiration token to allow download of archive
 
     Args:
         user (string): The user's name.
         project_name (string): The user's repository name.
+        permissions_token (string): JWT token signed by Wevolver.
 
     Returns:
         JsonResponse: An object with the archive download token
     """
+
     token = tokenlib.make_token({"project_name": project_name}, timeout=1, secret=settings.TOKEN_SECRET)
     response = JsonResponse({'token': token})
     response['Permissions'] = permissions_token
     return response
 
+@require_http_methods(["GET"])
 def download_archive(request, user, project_name):
-    """ Grabs and returns all of a user's repository as a tarball
+    """ Grabs and returns a user's repository as a tarball.
 
     Args:
         user (string): The user's name.
         project_name (string): The user's repository name.
 
     Returns:
-        JsonResponse: An object with the requested user's repository as a tarball
+        JsonResponse: An object with the requested user's repository as a tarball.
     """
     token = request.GET.get("token")
     if token:
@@ -252,13 +289,13 @@ def info_refs(request, user, project_name):
 
 @permissions.requires_git_permission_to('read')
 def upload_pack(request, user, project_name):
-    """ Calls service_rpc assuming the user is authenicated and has read permissions """
+    """ Calls service_rpc assuming the user is authenticated and has read permissions """
 
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
 @permissions.requires_git_permission_to('write')
 def receive_pack(request, user, project_name):
-    """ Calls service_rpc assuming the user is authenicated and has write permissions """
+    """ Calls service_rpc assuming the user is authenticated and has write permissions """
 
     return service_rpc(user, project_name, request.path_info.split('/')[-1], request.body)
 
@@ -286,16 +323,15 @@ def service_rpc(user, project_name, request_service, request_body):
 def read_tree(request, user, project_name, permissions_token):
     """ Grabs and returns a single file or a tree from a user's repository
 
-    if the requested object is a tree the function parses it intstead
-    of returning blindly.
+        The requested tree is first parsed into JSON.
 
     Args:
         user (string): The user's name.
         project_name (string): The user's repository name.
-        oid (string): The hash of the blob.
+        permissions_token (string): JWT token signed by Wevolver.
 
     Returns:
-        JsonResponse: An object with the requested file's data
+        JsonResponse: An object with the requested tree as JSON
     """
     path = request.GET.get('path').rstrip('/')
     directory = porcelain.generate_directory(user)

@@ -5,10 +5,12 @@ import pygit2
 import os
 
 def generate_directory(username):
-    """ Generates a unique directory structure for the project
+    """ Generates a unique directory structure for the project based on the user name.
 
     https://github.com/blog/117-scaling-lesson-23742
-
+    
+    Args:
+        username (string): The user's name slug
     Returns:
         Path (str): The unique path as a string
     """
@@ -19,21 +21,31 @@ def generate_directory(username):
     return os.path.join(a, b, c, d, username)
 
 def parse_file_tree(tree):
-    """ Parses the repository's tree structure
-
-    Returns a list of objects and metadata in the top level of the provided tree
+    """ Parses the repository's tree structure into JSON.
 
     Args:
         tree (Tree): The most recent commit tree.
 
     Returns:
-        dict: A list of all files in the top level of the provided tree.
+        dict: A list of all blobs and trees in the provided tree.
     """
 
     return {'data': [{'name': str(node.name), 'type': str(node.type), 'oid': str(node.id)} for node in tree]}
 
 
 def walk_tree(repo, full_path):
+    """ Given a path in returns the object.
+
+        If the object is a blob it returns the previous object as the tree else blob is None.
+
+    Args:
+        repo (Repository): The user's repository.
+        full_path (string): The full path to the object.
+
+    Returns:
+        current_object: The last tree in the path.
+        blob: The requested blob if there is one.
+    """
     current_object = repo.revparse_single('master').tree
     locations = full_path.split('/')
     if locations[0] == "":
@@ -49,6 +61,23 @@ def walk_tree(repo, full_path):
     return current_object, blob
 
 def add_blobs_to_tree(previous_commit_tree, repo, blobs, path):
+    """ Adds blobs to a tree at a given path.
+
+        Traverse the repository to find the given path to a blob. 
+        If the path to the blob does not exist it creates the necessary trees.
+        Then add blob to the last tree.
+        Then in reverse order trees are inserted into their parent up to the root.
+        Insert the new tree into the previous one to make a new snapshot.
+
+    Args:
+        previous_commit_tree: The tree object of the last commit.
+        repo (Repository): The user's repository.
+        blobs: New blobs to be added to a specific path.
+        path (string): The full path to the object.
+
+    Returns:
+        tree: New tree with the blobs added.
+    """
     current_tree = previous_commit_tree
     trees = []
 
@@ -82,16 +111,40 @@ def add_blobs_to_tree(previous_commit_tree, repo, blobs, path):
         return previous_commit_tree_builder.write()
 
 def commit_blob(repo, blob, path, name='readme.md'):
+    """ Adds a blob to a tree and commits it to a repository.
+        
+    Args:
+        repo (Repository): The user's repository.
+        blob (Blob): The file object.
+        path (string): The full path to the object.
+        name (string): Filename of the blob.
+    """
+
     previous_commit_tree = repo.revparse_single('master').tree
     newTree = add_blobs_to_tree(previous_commit_tree, repo, [(blob, name)], path)
     if newTree:
         commit_tree(repo, newTree)
 
 def commit_tree(repo, newTree):
+    """ Commits tree to a repository.
+        
+    Args:
+        repo (Repository): The user's repository.
+        newTree (Tree): Tree with new objects.
+    """
     signature = pygit2.Signature('Tester', 'test@example.com', int(time()), 0)
     commit = repo.create_commit(repo.head.name, signature, signature, 'Test commit with pygit2', newTree, [repo.head.peel().id])
 
 def flatten(tree, repo):
+    """ Translates a tree structure into a single level array.
+        
+    Args:
+        repo (Repository): The user's repository.
+        tree (Tree): Tree to be flattened.
+
+    Returns:
+        list: flattened tree
+    """
     flattened = []
     for entry in tree:
         if entry.type == 'tree':
