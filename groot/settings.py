@@ -24,9 +24,9 @@ INSTALLED_APPS = (
     'robots',
     'corsheaders',
     'django.contrib.sites',
+    'django.contrib.contenttypes',
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -36,13 +36,13 @@ SITE_ID = 1
 
 MIDDLEWARE_CLASSES = (
     'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
 )
 
 ROOT_URLCONF = 'groot.urls'
@@ -145,8 +145,13 @@ LOGGING = {
     }
 }
 
-with open("env.json") as f:
-    environment = json.loads(f.read())
+try:
+    with open("env.json") as f:
+        environment = json.loads(f.read())
+except:
+    with open("../env.json") as f:
+        environment = json.loads(f.read())
+
 
 def get_env(setting, env=environment):
     """Get the env variable or return explicit exception."""

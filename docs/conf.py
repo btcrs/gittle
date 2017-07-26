@@ -18,14 +18,15 @@
 #
 import os
 import sys
-sys.path.append(os.path.abspath('../app'))
+sys.path.append(os.path.abspath('../groot'))
+sys.path.append(os.path.abspath('../'))
 
 from django.conf import settings
 # app/versioning/settings.py
 # settings.configure()
 
 import django
-os.environ['DJANGO_SETTINGS_MODULE'] = 'versioning.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 django.setup()
 
 
@@ -57,7 +58,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'VersionControl'
+project = u'Groot'
 copyright = u'2017, Wevolver'
 author = u'Wevolver'
 

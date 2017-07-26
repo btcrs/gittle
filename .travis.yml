@@ -10,7 +10,7 @@ before_install:
       - pip install coverage
 
 script:
-      # - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code btcrs/groot /bin/sh -c 'cd ./app && coverage run --source=./ manage.py test'
+      - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code btcrs/groot /bin/sh -c 'cd ./app && coverage run --source=./ manage.py test'
       - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code btcrs/groot /bin/sh -c 'cd ./app && ls'
 
 after_success:

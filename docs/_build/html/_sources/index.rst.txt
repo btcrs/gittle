@@ -10,7 +10,11 @@ Welcome to VersionControl's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   modules/versions
+   Getting Started <gettingstarted>
+   Overview <overview>
+   API <api>
+   Versions <modules/groot.versions>
+   Permissions <modules/groot.permissions>
 
 Indices and tables
 ==================

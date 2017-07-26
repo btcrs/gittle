@@ -1,0 +1,1012 @@
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.settings' from '/Users/ben/Code/groot/groot/settings.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('module', 'groot.settings', <module 'groot.settings' from '/Users/ben/Code/groot/groot/settings.py' (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.settings import ImproperlyConfigured (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.settings (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.settings' from '/Users/ben/Code/groot/groot/settings.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'ImproperlyConfigured') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'django.core.exceptions.ImproperlyConfigured'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.settings import get_env (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.settings (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.settings' from '/Users/ben/Code/groot/groot/settings.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'get_env') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function get_env at 0x10ef1b730> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.settings.get_env', <function get_env at 0x10ef1b730>, {'members': <object object (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] output:
+
+.. py:module:: groot.settings
+
+
+.. py:function:: get_env(setting, env={'API_BASE': 'http://wevolver:8000/api/2', 'AUTH_BASE': 'http://wevolver:8000/o', 'TEST_API_BASE': 'http://dev.wevolver.com/api/2', 'TEST_AUTH_BASE': 'https://dev.wevolver.com/o', 'TOKEN_SECRET': 'open'})
+   :module: groot.settings
+
+   Get the env variable or return explicit exception.
+    (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] /Users/ben/Code/groot/docs/modules/groot.rst:26: input:
+.. automodule:: groot.urls
+    :members:
+    :undoc-members:
+    :show-inheritance:
+ (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.urls (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: autodoc: failed to import module 'groot.urls'; the following exception was raised:
+Traceback (most recent call last):
+  File "/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/sphinx/ext/autodoc.py", line 657, in import_object
+    __import__(self.modname)
+  File "/Users/ben/Code/groot/groot/urls.py", line 7, in <module>
+    url(r'^', include('groot.versions.urls')),
+  File "/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/django/conf/urls/__init__.py", line 50, in include
+    urlconf_module = import_module(urlconf_module)
+  File "/Users/ben/.pyenv/versions/3.6.1/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/Users/ben/Code/groot/groot/versions/urls.py", line 11, in <module>
+    url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/archive$', views.get_archive_token, name='get-archive-token'), # GET
+AttributeError: module 'groot.versions.views' has no attribute 'get_archive_token'
+ (2017-07-26 15:12:11; logging.py:97)
+WARNING:sphinx.util.docutils: /Users/ben/Code/groot/docs/modules/groot.rst:26: (WARNING/2) autodoc: failed to import module 'groot.urls'; the following exception was raised:
+Traceback (most recent call last):
+  File "/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/sphinx/ext/autodoc.py", line 657, in import_object
+    __import__(self.modname)
+  File "/Users/ben/Code/groot/groot/urls.py", line 7, in <module>
+    url(r'^', include('groot.versions.urls')),
+  File "/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/django/conf/urls/__init__.py", line 50, in include
+    urlconf_module = import_module(urlconf_module)
+  File "/Users/ben/.pyenv/versions/3.6.1/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/Users/ben/Code/groot/groot/versions/urls.py", line 11, in <module>
+    url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/archive$', views.get_archive_token, name='get-archive-token'), # GET
+AttributeError: module 'groot.versions.views' has no attribute 'get_archive_token' (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] /Users/ben/Code/groot/docs/modules/groot.rst:34: input:
+.. automodule:: groot.wsgi
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.wsgi (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.wsgi' from '/Users/ben/Code/groot/groot/wsgi.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('module', 'groot.wsgi', <module 'groot.wsgi' from '/Users/ben/Code/groot/groot/wsgi.py'>, {'members (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.wsgi import get_wsgi_application (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.wsgi (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.wsgi' from '/Users/ben/Code/groot/groot/wsgi.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'get_wsgi_application') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function get_wsgi_application at 0x10ef3ae18> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] output:
+
+.. py:module:: groot.wsgi
+
+WSGI config for versioning project.
+
+It exposes the WSGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/1.8/howto/deployment/wsgi/
+ (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] /Users/ben/Code/groot/docs/modules/groot.rst:43: input:
+.. automodule:: groot
+    :members:
+    :undoc-members:
+    :show-inheritance: (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot' from '/Users/ben/Code/groot/groot/__init__.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('module', 'groot', <module 'groot' from '/Users/ben/Code/groot/groot/__init__.py'>, {'members': <ob (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] output:
+
+.. py:module:: groot
+ (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.transforms: /Users/ben/Code/groot/docs/modules/groot.rst:26: (WARNING/2) autodoc: failed to import module ‘groot.urls’; the following exception was raised:
+Traceback (most recent call last):
+  File “/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/sphinx/ext/autodoc.py”, line 657, in import_object
+    __import__(self.modname)
+  File “/Users/ben/Code/groot/groot/urls.py”, line 7, in <module>
+    url(r’^’, include(‘groot.versions.urls’)),
+  File “/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/django/conf/urls/__init__.py”, line 50, in include
+    urlconf_module = import_module(urlconf_module)
+  File “/Users/ben/.pyenv/versions/3.6.1/lib/python3.6/importlib/__init__.py”, line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File “/Users/ben/Code/groot/groot/versions/urls.py”, line 11, in <module>
+    url(r’^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/archive$’, views.get_archive_token, name=’get-archive-token’), # GET
+AttributeError: module ‘groot.versions.views’ has no attribute ‘get_archive_token’
+ [filtered system message] (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "groot package"...>>,) (2017-07-26 15:12:11; logging.py:97)
+INFO:sphinx.util: [01mreading sources... [39;49;00m[ 80%] [35mmodules/groot.versions[39;49;00m                                                                                       (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'env-purge-doc'(<sphinx.environment.BuildEnvironment object at 0x10ebf3ba8>, 'modules/groot.versions') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'source-read'('modules/groot.versions', ['groot\\.versions package\n=======================\n\nSubpackages\n----- (2017-07-26 15:12:11; logging.py:97)
+WARNING:sphinx.util.docutils: toctree contains reference to nonexisting document 'modules/groot.versions.migrations' (2017-07-26 15:12:11; logging.py:100)
+DEBUG:sphinx.ext.autodoc: [autodoc] /Users/ben/Code/groot/docs/modules/groot.versions.rst:18: input:
+.. automodule:: groot.versions.git
+    :members:
+    :undoc-members:
+    :show-inheritance:
+ (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('module', 'groot.versions.git', <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/vers (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import Enum (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'Enum') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <enum 'Enum'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import GitResponse (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'GitResponse') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'groot.versions.git.GitResponse'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('class', 'groot.versions.git.GitResponse', <class 'groot.versions.git.GitResponse'>, {'members': <o (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import GitResponse.get_http_info_refs (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'GitResponse') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'groot.versions.git.GitResponse'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'get_http_info_refs') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function GitResponse.get_http_info_refs at 0x10f9e4378> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('method', 'groot.versions.git.GitResponse.get_http_info_refs', <function GitResponse.get_http_info_ (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import GitResponse.get_http_service_rpc (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'GitResponse') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'groot.versions.git.GitResponse'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'get_http_service_rpc') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function GitResponse.get_http_service_rpc at 0x10f9e4400> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('method', 'groot.versions.git.GitResponse.get_http_service_rpc', <function GitResponse.get_http_ser (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import GitResponse.set_response_first_line (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'GitResponse') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'groot.versions.git.GitResponse'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'set_response_first_line') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function GitResponse.set_response_first_line at 0x10f9e4268> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('method', 'groot.versions.git.GitResponse.set_response_first_line', <function GitResponse.set_respo (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import GitResponse.set_response_header (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'GitResponse') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'groot.versions.git.GitResponse'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'set_response_header') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function GitResponse.set_response_header at 0x10f9e41e0> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('method', 'groot.versions.git.GitResponse.set_response_header', <function GitResponse.set_response_ (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import GitResponse.set_response_payload (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'GitResponse') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'groot.versions.git.GitResponse'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'set_response_payload') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function GitResponse.set_response_payload at 0x10f9e42f0> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('method', 'groot.versions.git.GitResponse.set_response_payload', <function GitResponse.set_response (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import HttpResponse (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'HttpResponse') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'django.http.response.HttpResponse'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import HttpResponseNotFound (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'HttpResponseNotFound') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'django.http.response.HttpResponseNotFound'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import Services (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'Services') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <enum 'Services'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('class', 'groot.versions.git.Services', <enum 'Services'>, {'members': <object object at 0x10e4b3c8 (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import Services.git_receive_pack (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'Services') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <enum 'Services'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'git_receive_pack') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <Services.git_receive_pack: 'git-receive-pack'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import Services.git_upload_pack (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'Services') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <enum 'Services'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'git_upload_pack') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <Services.git_upload_pack: 'git-upload-pack'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import get_http_error (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'get_http_error') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function get_http_error at 0x10f9e4048> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.git.get_http_error', <function get_http_error at 0x10f9e4048>, {'member (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.git import plumbing (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.git (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.git' from '/Users/ben/Code/groot/groot/versions/git.py'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'plumbing') (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <enum 'git_plumbing'> (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] output:
+
+.. py:module:: groot.versions.git
+
+
+.. py:class:: GitResponse(*args, **kwargs)
+   :module: groot.versions.git
+
+   Bases: :class:`django.http.response.HttpResponse`
+
+   An extension of Django's HttpResponse that meets Git's smart HTTP specs
+   
+   The responses to Git's requests must follow a protocol, and this class is
+   meant to build properly formed responses.
+   
+   .. attribute:: service
+   
+      *str* -- the initiated git plumbing command
+   
+   .. attribute:: action
+   
+      *str* -- the action initiated by the service
+   
+   .. attribute:: repository
+   
+      *str* -- target repository of the request
+   
+   .. attribute:: data
+   
+      *str* -- uploaded data
+   
+   
+   .. py:method:: GitResponse.get_http_info_refs()
+      :module: groot.versions.git
+   
+      Creates a response for git's info_refs request
+      
+      Sets the headers, generates the first line of the request, and adds
+      the info_refs functions data to the payload.
+      
+      :returns: An HttpResponse for the handshake response for the info_refs function.
+      :rtype: GitResponse
+      
+   
+   .. py:method:: GitResponse.get_http_service_rpc()
+      :module: groot.versions.git
+   
+      Initiates a git plumbing rpc call depending on the received service request
+      
+      Sets the headers and sets the payload to the data generated by receive_pack or
+      upload_pack depending on whether the request is a push or a pull respectively.
+      
+      :returns: An HttpResponse containing the data requested by git's service call.
+      :rtype: GitResponse
+      
+   
+   .. py:method:: GitResponse.set_response_first_line()
+      :module: groot.versions.git
+   
+      Writes the first line of the responses body
+      
+      Constructs a line to detail the service of the current request. Adds the a prefix
+      (total line length in hex) to tell the client where the payload starts.
+      
+      e.g. 001f# service=git-receive-pack0000
+      
+   
+   .. py:method:: GitResponse.set_response_header()
+      :module: groot.versions.git
+   
+      Writes the required headers for a git handshake
+      
+      Primarily disables caching and sets the content type to the requested service and action
+      
+   
+   .. py:method:: GitResponse.set_response_payload(payload_type)
+      :module: groot.versions.git
+   
+      Executes the service requested and writes the data to the payload
+      
+      :param payload_type: git plumbing call initiated by the request.
+      :type payload_type: plumbing
+      
+
+.. py:class:: Services
+   :module: groot.versions.git
+
+   Bases: :class:`enum.Enum`
+
+   An enumeration.
+   
+   
+   .. py:attribute:: Services.git_receive_pack
+      :module: groot.versions.git
+      :annotation: = 'git-receive-pack'
+   
+   
+   .. py:attribute:: Services.git_upload_pack
+      :module: groot.versions.git
+      :annotation: = 'git-upload-pack'
+   
+
+.. py:function:: get_http_error(exception)
+   :module: groot.versions.git
+
+
+.. py:attribute:: plumbing
+   :module: groot.versions.git
+
+   alias of :class:`git_plumbing` (2017-07-26 15:12:11; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] /Users/ben/Code/groot/docs/modules/groot.versions.rst:26: input:
+.. automodule:: groot.versions.porcelain
+    :members:
+    :undoc-members:
+    :show-inheritance:
+ (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.porcelain (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.porcelain' from '/Users/ben/Code/groot/groot/versions/porcelain.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('module', 'groot.versions.porcelain', <module 'groot.versions.porcelain' from '/Users/ben/Code/groo (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.porcelain import add_blobs_to_tree (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.porcelain (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.porcelain' from '/Users/ben/Code/groot/groot/versions/porcelain.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'add_blobs_to_tree') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function add_blobs_to_tree at 0x10f9dec80> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.porcelain.add_blobs_to_tree', <function add_blobs_to_tree at 0x10f9dec8 (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.porcelain import commit_blob (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.porcelain (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.porcelain' from '/Users/ben/Code/groot/groot/versions/porcelain.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'commit_blob') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function commit_blob at 0x10f9ded08> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.porcelain.commit_blob', <function commit_blob at 0x10f9ded08>, {'member (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.porcelain import commit_tree (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.porcelain (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.porcelain' from '/Users/ben/Code/groot/groot/versions/porcelain.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'commit_tree') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function commit_tree at 0x10f9ded90> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.porcelain.commit_tree', <function commit_tree at 0x10f9ded90>, {'member (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.porcelain import flatten (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.porcelain (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.porcelain' from '/Users/ben/Code/groot/groot/versions/porcelain.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'flatten') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function flatten at 0x10f9dee18> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.porcelain.flatten', <function flatten at 0x10f9dee18>, {'members': <obj (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.porcelain import generate_directory (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.porcelain (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.porcelain' from '/Users/ben/Code/groot/groot/versions/porcelain.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'generate_directory') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function generate_directory at 0x10f1052f0> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.porcelain.generate_directory', <function generate_directory at 0x10f105 (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.porcelain import parse_file_tree (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.porcelain (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.porcelain' from '/Users/ben/Code/groot/groot/versions/porcelain.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'parse_file_tree') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function parse_file_tree at 0x10f9deb70> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.porcelain.parse_file_tree', <function parse_file_tree at 0x10f9deb70>,  (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.porcelain import time (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.porcelain (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.porcelain' from '/Users/ben/Code/groot/groot/versions/porcelain.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'time') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <built-in function time> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.porcelain import walk_tree (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.porcelain (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.porcelain' from '/Users/ben/Code/groot/groot/versions/porcelain.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'walk_tree') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function walk_tree at 0x10f9debf8> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.porcelain.walk_tree', <function walk_tree at 0x10f9debf8>, {'members':  (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] output:
+
+.. py:module:: groot.versions.porcelain
+
+
+.. py:function:: add_blobs_to_tree(previous_commit_tree, repo, blobs, path)
+   :module: groot.versions.porcelain
+
+   Adds blobs to a tree at a given path.
+   
+       Traverse the repository to find the given path to a blob.
+       If the path to the blob does not exist it creates the necessary trees.
+       Then add blob to the last tree.
+       Then in reverse order trees are inserted into their parent up to the root.
+       Insert the new tree into the previous one to make a new snapshot.
+   
+   :param previous_commit_tree: The tree object of the last commit.
+   :param repo: The user's repository.
+   :type repo: Repository
+   :param blobs: New blobs to be added to a specific path.
+   :param path: The full path to the object.
+   :type path: string
+   
+   :returns: New tree with the blobs added.
+   :rtype: tree
+   
+
+.. py:function:: commit_blob(repo, blob, path, name='readme.md')
+   :module: groot.versions.porcelain
+
+   Adds a blob to a tree and commits it to a repository.
+   
+   :param repo: The user's repository.
+   :type repo: Repository
+   :param blob: The file object.
+   :type blob: Blob
+   :param path: The full path to the object.
+   :type path: string
+   :param name: Filename of the blob.
+   :type name: string
+   
+
+.. py:function:: commit_tree(repo, newTree)
+   :module: groot.versions.porcelain
+
+   Commits tree to a repository.
+   
+   :param repo: The user's repository.
+   :type repo: Repository
+   :param newTree: Tree with new objects.
+   :type newTree: Tree
+   
+
+.. py:function:: flatten(tree, repo)
+   :module: groot.versions.porcelain
+
+   Translates a tree structure into a single level array.
+   
+   :param repo: The user's repository.
+   :type repo: Repository
+   :param tree: Tree to be flattened.
+   :type tree: Tree
+   
+   :returns: flattened tree
+   :rtype: list
+   
+
+.. py:function:: generate_directory(username)
+   :module: groot.versions.porcelain
+
+   Generates a unique directory structure for the project based on the user name.
+   
+   https://github.com/blog/117-scaling-lesson-23742
+   
+   :param username: The user's name slug
+   :type username: string
+   
+   :returns: The unique path as a string
+   :rtype: Path (str)
+   
+
+.. py:function:: parse_file_tree(tree)
+   :module: groot.versions.porcelain
+
+   Parses the repository's tree structure into JSON.
+   
+   :param tree: The most recent commit tree.
+   :type tree: Tree
+   
+   :returns: A list of all blobs and trees in the provided tree.
+   :rtype: dict
+   
+
+.. py:function:: walk_tree(repo, full_path)
+   :module: groot.versions.porcelain
+
+   Given a path in returns the object.
+   
+       If the object is a blob it returns the previous object as the tree else blob is None.
+   
+   :param repo: The user's repository.
+   :type repo: Repository
+   :param full_path: The full path to the object.
+   :type full_path: string
+   
+   :returns: The last tree in the path.
+             blob: The requested blob if there is one.
+   :rtype: current_object
+    (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] /Users/ben/Code/groot/docs/modules/groot.versions.rst:34: input:
+.. automodule:: groot.versions.urls
+    :members:
+    :undoc-members:
+    :show-inheritance:
+ (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.urls (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: autodoc: failed to import module 'groot.versions.urls'; the following exception was raised:
+Traceback (most recent call last):
+  File "/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/sphinx/ext/autodoc.py", line 657, in import_object
+    __import__(self.modname)
+  File "/Users/ben/Code/groot/groot/versions/urls.py", line 11, in <module>
+    url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/archive$', views.get_archive_token, name='get-archive-token'), # GET
+AttributeError: module 'groot.versions.views' has no attribute 'get_archive_token'
+ (2017-07-26 15:12:12; logging.py:97)
+WARNING:sphinx.util.docutils: /Users/ben/Code/groot/docs/modules/groot.versions.rst:34: (WARNING/2) autodoc: failed to import module 'groot.versions.urls'; the following exception was raised:
+Traceback (most recent call last):
+  File "/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/sphinx/ext/autodoc.py", line 657, in import_object
+    __import__(self.modname)
+  File "/Users/ben/Code/groot/groot/versions/urls.py", line 11, in <module>
+    url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/archive$', views.get_archive_token, name='get-archive-token'), # GET
+AttributeError: module 'groot.versions.views' has no attribute 'get_archive_token' (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] /Users/ben/Code/groot/docs/modules/groot.versions.rst:42: input:
+.. automodule:: groot.versions.views
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('module', 'groot.versions.views', <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/ (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import Actions (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'Actions') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <enum 'Actions'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('class', 'groot.versions.views.Actions', <enum 'Actions'>, {'members': <object object at 0x10e4b3c8 (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import Actions.advertisement (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'Actions') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <enum 'Actions'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'advertisement') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <Actions.advertisement: 'advertisement'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import Actions.result (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'Actions') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <enum 'Actions'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'result') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <Actions.result: 'result'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import BytesIO (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'BytesIO') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class '_io.BytesIO'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import Enum (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'Enum') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <enum 'Enum'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import FileWrapper (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'FileWrapper') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'wsgiref.util.FileWrapper'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import GitResponse (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'GitResponse') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'groot.versions.git.GitResponse'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import HttpResponse (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'HttpResponse') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'django.http.response.HttpResponse'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import HttpResponseBadRequest (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'HttpResponseBadRequest') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'django.http.response.HttpResponseBadRequest'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import JsonResponse (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'JsonResponse') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'django.http.response.JsonResponse'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import PermissionDenied (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'PermissionDenied') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'django.core.exceptions.PermissionDenied'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import StreamingHttpResponse (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'StreamingHttpResponse') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <class 'django.http.response.StreamingHttpResponse'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import create_new_folder (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'create_new_folder') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function create_new_folder at 0x10f9efb70> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.create_new_folder', <function create_new_folder at 0x10f9efb70>,  (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import create_project (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'create_project') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function create_project at 0x10f9ef6a8> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.create_project', <function create_project at 0x10f9ef6a8>, {'memb (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import delete_project (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'delete_project') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function delete_project at 0x10f9ef840> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.delete_project', <function delete_project at 0x10f9ef840>, {'memb (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import download_archive (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'download_archive') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function download_archive at 0x10f9f20d0> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.download_archive', <function download_archive at 0x10f9f20d0>, {' (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import info_refs (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'info_refs') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function info_refs at 0x10f9f2268> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.info_refs', <function info_refs at 0x10f9f2268>, {'members': <obj (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import list_bom (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'list_bom') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function list_bom at 0x10f9efea0> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.list_bom', <function list_bom at 0x10f9efea0>, {'members': <objec (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import read_file (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'read_file') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function read_file at 0x10f9ef9d8> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.read_file', <function read_file at 0x10f9ef9d8>, {'members': <obj (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import read_tree (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'read_tree') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function read_tree at 0x10f9f26a8> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.read_tree', <function read_tree at 0x10f9f26a8>, {'members': <obj (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import receive_files (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'receive_files') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function receive_files at 0x10f9efd08> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.receive_files', <function receive_files at 0x10f9efd08>, {'member (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import receive_pack (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'receive_pack') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function receive_pack at 0x10f9f2598> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.receive_pack', <function receive_pack at 0x10f9f2598>, {'members' (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import require_http_methods (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'require_http_methods') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function require_http_methods at 0x10efd61e0> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import service_rpc (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'service_rpc') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function service_rpc at 0x10efd6a60> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.service_rpc', <function service_rpc at 0x10efd6a60>, {'members':  (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import time (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'time') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <built-in function time> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] from groot.versions.views import upload_pack (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.views' from '/Users/ben/Code/groot/groot/versions/views.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] getattr(_, 'upload_pack') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <function upload_pack at 0x10f9f2488> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'groot.versions.views.upload_pack', <function upload_pack at 0x10f9f2488>, {'members':  (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] output:
+
+.. py:module:: groot.versions.views
+
+
+.. py:class:: Actions
+   :module: groot.versions.views
+
+   Bases: :class:`enum.Enum`
+
+   An enumeration.
+   
+   
+   .. py:attribute:: Actions.advertisement
+      :module: groot.versions.views
+      :annotation: = 'advertisement'
+   
+   
+   .. py:attribute:: Actions.result
+      :module: groot.versions.views
+      :annotation: = 'result'
+   
+
+.. py:function:: create_new_folder(request, user, project_name, permissions_token)
+   :module: groot.versions.views
+
+   Commits a single file to a specified path, creating a new folder in the repository.
+   
+   :param user: The user's name.
+   :type user: string
+   :param project_name: The user's repository name.
+   :type project_name: string
+   :param permissions_token: JWT token signed by Wevolver.
+   :type permissions_token: string
+   
+   :returns: An object
+   :rtype: JsonResponse
+   
+
+.. py:function:: create_project(request, user, project_name, permissions_token)
+   :module: groot.versions.views
+
+   Creates a bare repository (project) based on the user name
+       and project name in the URL.
+   
+       It generates a unique path based on the user name and
+       project, creates a default readme and commits it.
+   
+   :param user: The user's name.
+   :type user: string
+   :param project_name: The user's repository name.
+   :type project_name: string
+   :param permissions_token: JWT token signed by Wevolver.
+   :type permissions_token: string
+   
+   :returns: A message indicating the success or failure of the create
+   :rtype: HttpResponse
+   
+
+.. py:function:: delete_project(request, user, project_name, permissions_token)
+   :module: groot.versions.views
+
+   Finds the repository specified in the URL and deletes from the file system.
+   
+   :param user: The user's name.
+   :type user: string
+   :param project_name: The user's repository name.
+   :type project_name: string
+   :param permissions_token: JWT token signed by Wevolver.
+   :type permissions_token: string
+   
+   :returns: A message indicating the success or failure of the delete
+   :rtype: HttpResponse
+   
+
+.. py:function:: download_archive(request, user, project_name)
+   :module: groot.versions.views
+
+   Grabs and returns a user's repository as a tarball.
+   
+   :param user: The user's name.
+   :type user: string
+   :param project_name: The user's repository name.
+   :type project_name: string
+   
+   :returns: An object with the requested user's repository as a tarball.
+   :rtype: JsonResponse
+   
+
+.. py:function:: info_refs(request, user, project_name)
+   :module: groot.versions.views
+
+   Initiates a handshake for a smart HTTP connection
+   
+   https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
+   
+   :param user: The user's name.
+   :type user: string
+   :param project_name: The user's repository name.
+   :type project_name: string
+   
+   :returns: A HttpResponse with the proper headers and payload needed by git.
+   :rtype: GitResponse
+   
+
+.. py:function:: list_bom(request, user, project_name, permissions_token)
+   :module: groot.versions.views
+
+   Collects all the bom.csv files in a repository and return their sum.
+   
+       Flattens the repository's tree into an array. Then filters the array for 'bom.csv',
+       concatenates them and returns unique lines.
+   
+   :param user: The user's name.
+   :type user: string
+   :param project_name: The user's repository name.
+   :type project_name: string
+   :param permissions_token: JWT token signed by Wevolver.
+   :type permissions_token: string
+   
+   :returns: The full Bill of Materials (BOM)
+   :rtype: HttpResponse
+   
+
+.. py:function:: read_file(request, user, project_name, permissions_token)
+   :module: groot.versions.views
+
+   Finds a file in the path of the repository specified by the URL
+       and returns the blob.
+   
+   :param user: The user's name.
+   :type user: string
+   :param project_name: The user's repository name.
+   :type project_name: string
+   :param permissions_token: JWT token signed by Wevolver.
+   :type permissions_token: string
+   
+   :returns: The file's raw data.
+   :rtype: StreamingHttpResponse
+   
+
+.. py:function:: read_tree(request, user, project_name, permissions_token)
+   :module: groot.versions.views
+
+   Grabs and returns a single file or a tree from a user's repository
+   
+       The requested tree is first parsed into JSON.
+   
+   :param user: The user's name.
+   :type user: string
+   :param project_name: The user's repository name.
+   :type project_name: string
+   :param permissions_token: JWT token signed by Wevolver.
+   :type permissions_token: string
+   
+   :returns: An object with the requested tree as JSON
+   :rtype: JsonResponse
+   
+
+.. py:function:: receive_files(request, user, project_name, permissions_token)
+   :module: groot.versions.views
+
+   Receives and commits an array of files to a specific path in the repository.
+   
+   :param user: The user's name.
+   :type user: string
+   :param project_name: The user's repository name.
+   :type project_name: string
+   :param permissions_token: JWT token signed by Wevolver.
+   :type permissions_token: string
+   
+   :returns: An object
+   :rtype: JsonResponse
+   
+
+.. py:function:: receive_pack(request, user, project_name)
+   :module: groot.versions.views
+
+   Calls service_rpc assuming the user is authenticated and has write permissions
+   
+
+.. py:function:: service_rpc(user, project_name, request_service, request_body)
+   :module: groot.versions.views
+
+   Calls the Git commands to pull or push data from the server depending on the received service.
+   
+   https://git-scm.com/book/en/v2/Git-Internals-Transfer-Protocols
+   
+   :param user: The user's name.
+   :type user: string
+   :param project_name: The user's repository name.
+   :type project_name: string
+   
+   :returns: An HttpResponse that indicates success or failure and may include the requested packfile
+   :rtype: GitResponse
+   
+
+.. py:function:: upload_pack(request, user, project_name)
+   :module: groot.versions.views
+
+   Calls service_rpc assuming the user is authenticated and has read permissions
+    (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] /Users/ben/Code/groot/docs/modules/groot.versions.rst:51: input:
+.. automodule:: groot.versions
+    :members:
+    :undoc-members:
+    :show-inheritance: (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions' from '/Users/ben/Code/groot/groot/versions/__init__.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('module', 'groot.versions', <module 'groot.versions' from '/Users/ben/Code/groot/groot/versions/__i (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] output:
+
+.. py:module:: groot.versions
+ (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.transforms: /Users/ben/Code/groot/docs/modules/groot.versions.rst:7: (WARNING/2) toctree contains reference to nonexisting document ‘modules/groot.versions.migrations’ [filtered system message] (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.transforms: /Users/ben/Code/groot/docs/modules/groot.versions.rst:34: (WARNING/2) autodoc: failed to import module ‘groot.versions.urls’; the following exception was raised:
+Traceback (most recent call last):
+  File “/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/sphinx/ext/autodoc.py”, line 657, in import_object
+    __import__(self.modname)
+  File “/Users/ben/Code/groot/groot/versions/urls.py”, line 11, in <module>
+    url(r’^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/archive$’, views.get_archive_token, name=’get-archive-token’), # GET
+AttributeError: module ‘groot.versions.views’ has no attribute ‘get_archive_token’
+ [filtered system message] (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "groot.versions package"...>>,) (2017-07-26 15:12:12; logging.py:97)
+Level 15:sphinx.ext.viewcode: Didn't find GitResponse.service in groot.versions.git (2017-07-26 15:12:12; logging.py:97)
+Level 15:sphinx.ext.viewcode: Didn't find GitResponse.action in groot.versions.git (2017-07-26 15:12:12; logging.py:97)
+Level 15:sphinx.ext.viewcode: Didn't find GitResponse.repository in groot.versions.git (2017-07-26 15:12:12; logging.py:97)
+Level 15:sphinx.ext.viewcode: Didn't find GitResponse.data in groot.versions.git (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.util: [01mreading sources... [39;49;00m[100%] [35mmodules/groot.versions.tests[39;49;00m                                                                                 (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'env-purge-doc'(<sphinx.environment.BuildEnvironment object at 0x10ebf3ba8>, 'modules/groot.versions.tests') (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'source-read'('modules/groot.versions.tests', ['groot\\.versions\\.tests package\n==============================\ (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] /Users/ben/Code/groot/docs/modules/groot.versions.tests.rst:10: input:
+.. automodule:: groot.versions.tests.test_views
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+ (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.tests.test_views (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: autodoc: failed to import module 'groot.versions.tests.test_views'; the following exception was raised:
+Traceback (most recent call last):
+  File "/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/sphinx/ext/autodoc.py", line 657, in import_object
+    __import__(self.modname)
+  File "/Users/ben/Code/groot/groot/versions/tests/test_views.py", line 3, in <module>
+    from versions.views import generate_directory
+ImportError: cannot import name 'generate_directory'
+ (2017-07-26 15:12:12; logging.py:97)
+WARNING:sphinx.util.docutils: /Users/ben/Code/groot/docs/modules/groot.versions.tests.rst:10: (WARNING/2) autodoc: failed to import module 'groot.versions.tests.test_views'; the following exception was raised:
+Traceback (most recent call last):
+  File "/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/sphinx/ext/autodoc.py", line 657, in import_object
+    __import__(self.modname)
+  File "/Users/ben/Code/groot/groot/versions/tests/test_views.py", line 3, in <module>
+    from versions.views import generate_directory
+ImportError: cannot import name 'generate_directory' (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] /Users/ben/Code/groot/docs/modules/groot.versions.tests.rst:19: input:
+.. automodule:: groot.versions.tests
+    :members:
+    :undoc-members:
+    :show-inheritance: (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] import groot.versions.tests (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] => <module 'groot.versions.tests' from '/Users/ben/Code/groot/groot/versions/tests/__init__.py'> (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'autodoc-process-docstring'('module', 'groot.versions.tests', <module 'groot.versions.tests' from '/Users/ben/Code/groot/groot/ (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.ext.autodoc: [autodoc] output:
+
+.. py:module:: groot.versions.tests
+ (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.transforms: /Users/ben/Code/groot/docs/modules/groot.versions.tests.rst:10: (WARNING/2) autodoc: failed to import module ‘groot.versions.tests.test_views’; the following exception was raised:
+Traceback (most recent call last):
+  File “/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/sphinx/ext/autodoc.py”, line 657, in import_object
+    __import__(self.modname)
+  File “/Users/ben/Code/groot/groot/versions/tests/test_views.py”, line 3, in <module>
+    from versions.views import generate_directory
+ImportError: cannot import name ‘generate_directory’
+ [filtered system message] (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "groot.versions.tests package"...>>,) (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.util:  (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'env-updated'(<sphinx.environment.BuildEnvironment object at 0x10ebf3ba8>,) (2017-07-26 15:12:12; logging.py:97)
+WARNING:sphinx.util.docutils: /Users/ben/Code/groot/docs/modules/groot.rst:26: (WARNING/2) autodoc: failed to import module 'groot.urls'; the following exception was raised:
+Traceback (most recent call last):
+  File "/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/sphinx/ext/autodoc.py", line 657, in import_object
+    __import__(self.modname)
+  File "/Users/ben/Code/groot/groot/urls.py", line 7, in <module>
+    url(r'^', include('groot.versions.urls')),
+  File "/Users/ben/.pyenv/versions/groot/lib/python3.6/site-packages/django/conf/urls/__init__.py", line 50, in include
+    urlconf_module = import_module(urlconf_module)
+  File "/Users/ben/.pyenv/versions/3.6.1/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "/Users/ben/Code/groot/groot/versions/urls.py", line 11, in <module>
+    url(r'^(?P<user>[-.\w]+)/(?P<project_name>[-.\w]+)/archive$', views.get_archive_token, name='get-archive-token'), # GET
+AttributeError: module 'groot.versions.views' has no attribute 'get_archive_token' (2017-07-26 15:12:11; logging.py:97)
+INFO:sphinx.builders: [01mlooking for now-outdated files... [39;49;00m (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'env-get-updated'(<sphinx.environment.BuildEnvironment object at 0x10ebf3ba8>,) (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.builders: none found (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.builders: [01mpickling environment... [39;49;00m (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.builders: done (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.builders: [01mchecking consistency... [39;49;00m (2017-07-26 15:12:12; logging.py:97)
+WARNING:sphinx.environment: document isn't included in any toctree (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'env-check-consistency'(<sphinx.environment.BuildEnvironment object at 0x10ebf3ba8>,) (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.builders: done (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.builders: docnames to write: api, gettingstarted, modules/groot, modules/groot.versions, modules/groot.versions.tests (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.builders: [01mpreparing documents... [39;49;00m (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.builders: done (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.util: [01mwriting output... [39;49;00m[ 14%] [32mapi[39;49;00m                                                                                                           (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "groot"...>>, 'api') (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.util: [01mwriting output... [39;49;00m[ 28%] [32mgettingstarted[39;49;00m                                                                                                (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "groot"...>>, 'gettingstarted') (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.util: [01mwriting output... [39;49;00m[ 42%] [32mindex[39;49;00m                                                                                                         (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <comment...><section "welcome to versioncontrol's docume ...>, 'index') (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.util: [01mwriting output... [39;49;00m[ 57%] [32mmodules/groot[39;49;00m                                                                                                 (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "groot package"...>>, 'modules/groot') (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.util: [01mwriting output... [39;49;00m[ 71%] [32mmodules/groot.versions[39;49;00m                                                                                        (2017-07-26 15:12:12; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "groot.versions package"...>>, 'modules/groot.versions') (2017-07-26 15:12:12; logging.py:97)
+INFO:sphinx.util: [01mwriting output... [39;49;00m[ 85%] [32mmodules/groot.versions.tests[39;49;00m                                                                                  (2017-07-26 15:12:13; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "groot.versions.tests package"...>>, 'modules/groot.versions.tests') (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.util: [01mwriting output... [39;49;00m[100%] [32mmodules/modules[39;49;00m                                                                                               (2017-07-26 15:12:13; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "groot"...>>, 'modules/modules') (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.util:  (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html: [01mgenerating indices...[39;49;00m (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html:  genindex (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html:  py-modindex (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html:  (2017-07-26 15:12:13; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'html-collect-pages'() (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.util: [01mhighlighting module code... [39;49;00m[ 16%] [34;01mgroot.settings[39;49;00m                                                                                      (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.util: [01mhighlighting module code... [39;49;00m[ 33%] [34;01mgroot.permissions.decorators[39;49;00m                                                                        (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.util: [01mhighlighting module code... [39;49;00m[ 50%] [34;01mgroot.permissions.views[39;49;00m                                                                             (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.util: [01mhighlighting module code... [39;49;00m[ 66%] [34;01mgroot.versions.git[39;49;00m                                                                                  (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.util: [01mhighlighting module code... [39;49;00m[ 83%] [34;01mgroot.versions.porcelain[39;49;00m                                                                            (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.util: [01mhighlighting module code... [39;49;00m[100%] [34;01mgroot.versions.views[39;49;00m                                                                                (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.util:  (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html: [01mwriting additional pages...[39;49;00m (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html:  search (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html:  (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html: [01mcopying static files... [39;49;00m (2017-07-26 15:12:13; logging.py:97)
+WARNING:sphinx.builders.html: html_static_path entry '/Users/ben/Code/groot/docs/_static' does not exist (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html: done (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html: [01mcopying extra files... [39;49;00m (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html: done (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html: [01mdumping search index in English (code: en) ... [39;49;00m (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html: done (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html: [01mdumping object inventory... [39;49;00m (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.builders.html: done (2017-07-26 15:12:13; logging.py:97)
+INFO:sphinx.application: [01mbuild succeeded.[39;49;00m (2017-07-26 15:12:13; logging.py:97)
+DEBUG:sphinx.application: [app] emitting event: 'build-finished'(None,) (2017-07-26 15:12:13; logging.py:97)
