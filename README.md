@@ -21,10 +21,21 @@ $ python manage.py runserver
 ```
 
 ## Examples
+In all examples api is the base url, user and project can be whatever you choose. Username and password are not enforced.
+
 Creating  repo:
 
-Cloning a repo:
+```
+ curl -X POST \
+  {{api}}/{{user}}/{{project}}/create \
+  -H "Content-Type: application/json"
+```
 
+Cloning a repo. In the command line:
+
+```
+ $ git clone {{project}}
+```
 
 <!--## Contributing
 
