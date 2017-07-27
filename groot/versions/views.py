@@ -323,6 +323,8 @@ def read_tree(request, user, project_name, permissions_token):
     try:
         path = request.GET.get('path').rstrip('/').lstrip('/')
         directory = porcelain.generate_directory(user)
+        print(directory)
+        print(project_name)
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
         git_tree, git_blob = porcelain.walk_tree(repo, path)
         parsed_tree = None
