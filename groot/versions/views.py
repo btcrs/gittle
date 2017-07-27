@@ -53,20 +53,18 @@ def create_project(request, user, project_name, permissions_token):
     if not os.path.exists(os.path.join('./repos', directory)):
         os.makedirs(os.path.join('./repos', directory))
 
-    repo = pygit2.init_repository(path, True)
-    tree = repo.TreeBuilder()
-    message = "Initial Commit - Automated"
-    comitter = pygit2.Signature('Wevolver', 'Wevolver')
-    readme = "#{} \nThis is where you should document your project  \n### Getting Started".format(project_name)
-    blob = repo.create_blob(readme)
-    tree.insert('readme.md', blob, pygit2.GIT_FILEMODE_BLOB)
-
     try:
+        repo = pygit2.init_repository(path, True)
+        tree = repo.TreeBuilder()
+        message = "Initial Commit - Automated"
+        comitter = pygit2.Signature('Wevolver', 'Wevolver')
+        readme = "#{} \nThis is where you should document your project  \n### Getting Started".format(project_name)
+        blob = repo.create_blob(readme)
+        tree.insert('readme.md', blob, pygit2.GIT_FILEMODE_BLOB)
         sha = repo.create_commit('HEAD', comitter, comitter, message, tree.write(), [])
         response = HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
     except pygit2.GitError as e:
         response = HttpResponseBadRequest("looks like you already have a project with this name!")
-
     return response
 
 @require_http_methods(["POST"])
@@ -109,11 +107,7 @@ def read_file(request, user, project_name, permissions_token):
     """
     try:
         path = request.GET.get('path').rstrip('/')
-    except:
-        return HttpResponseBadRequest("No path parameter.")
-
-    directory = porcelain.generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory, project_name)):
+        directory = porcelain.generate_directory(user)
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
         git_tree, git_blob = porcelain.walk_tree(repo, path)
         parsed_file = None
@@ -128,8 +122,12 @@ def read_file(request, user, project_name, permissions_token):
 
         # for download needs and argument in the call
         # response['Content-Disposition'] = "attachment; filename=%s" % path
-    else:
-        response = HttpResponseBadRequest("Not a repository.")
+    except KeyError as e:
+        response = HttpResponseBadRequest("The requested path doesn't exist!")
+    except AttributeError as e:
+        response = HttpResponseBadRequest("The request is missing a path parameter")
+    except pygit2.GitError as e:
+        response = HttpResponseBadRequest("Not a git repository.")
     return response
 
 @require_http_methods(["POST"])
@@ -146,14 +144,19 @@ def create_new_folder(request, user, project_name, permissions_token):
         JsonResponse: An object
     """
 
-    directory = porcelain.generate_directory(user)
-    post = json.loads(request.body)
-    path = post['path'].lstrip('/').rstrip('/')
-    repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-    readme = "#{} \nThis is where you should document your project  \n### Getting Started".format(project_name)
-    blob = repo.create_blob(readme)
-    porcelain.commit_blob(repo, blob, path.split('/'), 'readme.md')
-    response = JsonResponse({'message': 'Folder Created'})
+    try:
+        directory = porcelain.generate_directory(user)
+        post = json.loads(request.body)
+        path = post['path'].lstrip('/').rstrip('/')
+        repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
+        readme = "#{} \nThis is where you should document your project  \n### Getting Started".format(project_name)
+        blob = repo.create_blob(readme)
+        porcelain.commit_blob(repo, blob, path.split('/'), 'readme.md')
+        response = JsonResponse({'message': 'Folder Created'})
+    except KeyError as e:
+        response = HttpResponseBadRequest("The requested path doestn't exist or the request is missing a path parameter")
+    except pygit2.GitError as e:
+        response = HttpResponseBadRequest("looks like you already have a project with this name!")
     response['Permissions'] = permissions_token
     return response
 
@@ -170,26 +173,26 @@ def receive_files(request, user, project_name, permissions_token):
     Returns:
         JsonResponse: An object
     """
-    directory = porcelain.generate_directory(user)
-    path = request.GET.get('path').rstrip('/')
 
     try:
+        directory = porcelain.generate_directory(user)
+        path = request.GET.get('path').rstrip('/')
         repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-    except err:
-        return HttpResponseBadRequest('Repo does not exist.')
-
-    if request.FILES:
-        old_commit_tree = repo.revparse_single('master').tree
-        blobs = []
-        for key, file in request.FILES.items():
-            blob = repo.create_blob(file.read())
-            blobs.append((blob, file.name))
-
-        new_commit_tree = porcelain.add_blobs_to_tree(old_commit_tree, repo, blobs, path.split('/'))
-        porcelain.commit_tree(repo, new_commit_tree)
-        response = JsonResponse({'message': 'Files uploaded'})
-    else:
-        response = HttpResponseBadRequest('No files sent.')
+        if request.FILES:
+            old_commit_tree = repo.revparse_single('master').tree
+            blobs = []
+            for key, file in request.FILES.items():
+                blob = repo.create_blob(file.read())
+                blobs.append((blob, file.name))
+            new_commit_tree = porcelain.add_blobs_to_tree(old_commit_tree, repo, blobs, path.split('/'))
+            porcelain.commit_tree(repo, new_commit_tree)
+            response = JsonResponse({'message': 'Files uploaded'})
+        else:
+            response = JsonResponse({'message': 'No files received'})
+    except AttributeError as e:
+        response = HttpResponseBadRequest("No path parameter.")
+    except pygit2.GitError as e:
+        response = HttpResponseBadRequest("Not a git repository.")
 
     response['Permissions'] = permissions_token
     return response
@@ -211,8 +214,8 @@ def list_bom(request, user, project_name, permissions_token):
         HttpResponse: The full Bill of Materials (BOM)
     """
 
-    directory = porcelain.generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory, project_name)):
+    try:
+        directory = porcelain.generate_directory(user)
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
         tree = (repo.revparse_single('master').tree)
         blobs = porcelain.flatten(tree, repo)
@@ -220,8 +223,8 @@ def list_bom(request, user, project_name, permissions_token):
         for b in [blob for blob in blobs if blob.name == 'bom.csv']:
             data += str(repo[b.id].data, 'utf-8')
         response = HttpResponse(data)
-    else:
-        response = HttpResponseBadRequest('Not a repository')
+    except pygit2.giterror as e:
+        response = httpresponsebadrequest('not a repository')
     return response
 
 @require_http_methods(["GET"])
@@ -242,11 +245,11 @@ def download_archive(request, user, project_name, permissions_token):
     response['Content-Disposition'] = 'attachment; filename=' + filename
     directory = porcelain.generate_directory(user)
 
-    if os.path.exists(os.path.join('./repos', directory, project_name)):
+    try:
         with tarfile.open(fileobj=response, mode='w') as archive:
             repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
             repo.write_archive(repo.head.target, archive)
-    else:
+    except pygit2.GitError as e:
         response = HttpResponseBadRequest("Not a repository")
     return response
 
@@ -317,9 +320,10 @@ def read_tree(request, user, project_name, permissions_token):
     Returns:
         JsonResponse: An object with the requested tree as JSON
     """
-    path = request.GET.get('path').rstrip('/')
-    directory = porcelain.generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory)):
+    try:
+        path = request.GET.get('path').rstrip('/')
+        print(path)
+        directory = porcelain.generate_directory(user)
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
         git_tree, git_blob = porcelain.walk_tree(repo, path)
         parsed_tree = None
@@ -328,9 +332,10 @@ def read_tree(request, user, project_name, permissions_token):
             parsed_tree = porcelain.parse_file_tree(git_tree)
         if type(git_blob) == pygit2.Blob:
             parsed_file = str(base64.b64encode(git_blob.data), 'utf-8')
-
         response = JsonResponse({'file': parsed_file, 'tree': parsed_tree})
-    else:
-        response = JsonResponse({'file': 'None', 'tree': 'None'})
+    except pygit2.GitError as e:
+        response = HttpResponseBadRequest("Not a git repository")
+    except AttributeError as e:
+        response = HttpResponseBadRequest("No path parameter")
     response['Permissions'] = permissions_token
     return response
