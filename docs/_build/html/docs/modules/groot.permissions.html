@@ -6,11 +6,11 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>groot.permissions package &#8212; Groot 0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
+        URL_ROOT:    '../../',
         VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
@@ -18,14 +18,13 @@
         SOURCELINK_SUFFIX: '.txt'
       };
     </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="groot.versions.tests package" href="groot.versions.tests.html" />
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
    
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
@@ -48,7 +47,7 @@
 <span id="groot-permissions-decorators-module"></span><h2>groot.permissions.decorators module<a class="headerlink" href="#module-groot.permissions.decorators" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="groot.permissions.decorators.basic_auth">
-<code class="descclassname">groot.permissions.decorators.</code><code class="descname">basic_auth</code><span class="sig-paren">(</span><em>authorization_header</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/groot/permissions/decorators.html#basic_auth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.decorators.basic_auth" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">groot.permissions.decorators.</code><code class="descname">basic_auth</code><span class="sig-paren">(</span><em>authorization_header</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/groot/permissions/decorators.html#basic_auth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.decorators.basic_auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Basic auth middleware for git requests</p>
 <p>Attempts to log the current user into the Wevolver API login endpoint</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -63,7 +62,7 @@
 
 <dl class="function">
 <dt id="groot.permissions.decorators.decode_token">
-<code class="descclassname">groot.permissions.decorators.</code><code class="descname">decode_token</code><span class="sig-paren">(</span><em>token</em>, <em>user_id</em>, <em>user_name</em>, <em>project_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/groot/permissions/decorators.html#decode_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.decorators.decode_token" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">groot.permissions.decorators.</code><code class="descname">decode_token</code><span class="sig-paren">(</span><em>token</em>, <em>user_id</em>, <em>user_name</em>, <em>project_name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/groot/permissions/decorators.html#decode_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.decorators.decode_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decodes the received token using Wevolvers JWT public key</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -83,7 +82,7 @@
 
 <dl class="function">
 <dt id="groot.permissions.decorators.get_token">
-<code class="descclassname">groot.permissions.decorators.</code><code class="descname">get_token</code><span class="sig-paren">(</span><em>user_id</em>, <em>user_name</em>, <em>project_name</em>, <em>access_token</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/groot/permissions/decorators.html#get_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.decorators.get_token" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">groot.permissions.decorators.</code><code class="descname">get_token</code><span class="sig-paren">(</span><em>user_id</em>, <em>user_name</em>, <em>project_name</em>, <em>access_token</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/groot/permissions/decorators.html#get_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.decorators.get_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks against the Wevolver API to see if the users token is currently valid</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -101,7 +100,7 @@
 
 <dl class="function">
 <dt id="groot.permissions.decorators.requires_git_permission_to">
-<code class="descclassname">groot.permissions.decorators.</code><code class="descname">requires_git_permission_to</code><span class="sig-paren">(</span><em>permission</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/groot/permissions/decorators.html#requires_git_permission_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.decorators.requires_git_permission_to" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">groot.permissions.decorators.</code><code class="descname">requires_git_permission_to</code><span class="sig-paren">(</span><em>permission</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/groot/permissions/decorators.html#requires_git_permission_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.decorators.requires_git_permission_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines the user and authorization through basic http auth</p>
 <p>Uses the requests HTTP_AUTHORIZATION to authorize the user against
 basic HTTP auth</p>
@@ -109,7 +108,7 @@ basic HTTP auth</p>
 
 <dl class="function">
 <dt id="groot.permissions.decorators.requires_permission_to">
-<code class="descclassname">groot.permissions.decorators.</code><code class="descname">requires_permission_to</code><span class="sig-paren">(</span><em>permission</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/groot/permissions/decorators.html#requires_permission_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.decorators.requires_permission_to" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">groot.permissions.decorators.</code><code class="descname">requires_permission_to</code><span class="sig-paren">(</span><em>permission</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/groot/permissions/decorators.html#requires_permission_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.decorators.requires_permission_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines the user and authorization through Wevolver token based auth</p>
 <p>Uses the request’s access_token and user_id params to check the user’s bearer
 token against the Wevolver API</p>
@@ -125,7 +124,7 @@ get a list of permissions based on their role</p>
 <span id="groot-permissions-views-module"></span><h2>groot.permissions.views module<a class="headerlink" href="#module-groot.permissions.views" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="groot.permissions.views.login">
-<code class="descclassname">groot.permissions.views.</code><code class="descname">login</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/groot/permissions/views.html#login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.views.login" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">groot.permissions.views.</code><code class="descname">login</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/groot/permissions/views.html#login"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#groot.permissions.views.login" title="Permalink to this definition">¶</a></dt>
 <dd><p>Requests a client_token from the Wevolver Auth application</p>
 <p>Using the requesting user’s username and password, we send a authorization
 request to the login endpoint Wevolver’s authenication/authorization (/o) API.</p>
@@ -153,55 +152,34 @@ request to the login endpoint Wevolver’s authenication/authorization (/o) API.
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">Groot</a></h1>
-
-
-
-<p class="blurb">A git server build for hardware development</p>
-
-
-
-
-<p>
-<iframe src="https://ghbtns.com/github-btn.html?user=btcrs&repo=groot&type=watch&count=true&size=large&v=2"
-  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
-</p>
-
-
-
-
-
-    
-
-<p>
-<a href="https://travis-ci.org/btcrs/groot">
-    <img
-        alt="https://secure.travis-ci.org/btcrs/groot.svg?branch=master"
-        src="https://secure.travis-ci.org/btcrs/groot.svg?branch=master"
-    />
-</a>
-</p>
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../gettingstarted.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="groot.versions.html">Versions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Permissions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-groot.permissions.decorators">groot.permissions.decorators module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-groot.permissions.urls">groot.permissions.urls module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-groot.permissions.views">groot.permissions.views module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-groot.permissions">Module contents</a></li>
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">groot.permissions package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-groot.permissions.decorators">groot.permissions.decorators module</a></li>
+<li><a class="reference internal" href="#module-groot.permissions.urls">groot.permissions.urls module</a></li>
+<li><a class="reference internal" href="#module-groot.permissions.views">groot.permissions.views module</a></li>
+<li><a class="reference internal" href="#module-groot.permissions">Module contents</a></li>
 </ul>
 </li>
 </ul>
-
-
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/docs/modules/groot.permissions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
+    <form class="search" action="../../search.html" method="get">
       <div><input type="text" name="q" /></div>
       <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
@@ -221,7 +199,7 @@ request to the login endpoint Wevolver’s authenication/authorization (/o) API.
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="../_sources/modules/groot.permissions.rst.txt"
+      <a href="../../_sources/docs/modules/groot.permissions.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
