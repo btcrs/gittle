@@ -52,8 +52,6 @@ def create_project(request, user, project_name, permissions_token):
 
     if not os.path.exists(os.path.join('./repos', directory)):
         os.makedirs(os.path.join('./repos', directory))
-    elif os.path.exists(path):
-        return httpresponsebadrequest("looks like you already have a project with this name!")
 
     repo = pygit2.init_repository(path, True)
     tree = repo.TreeBuilder()
@@ -62,9 +60,14 @@ def create_project(request, user, project_name, permissions_token):
     readme = "#{} \nThis is where you should document your project  \n### Getting Started".format(project_name)
     blob = repo.create_blob(readme)
     tree.insert('readme.md', blob, pygit2.GIT_FILEMODE_BLOB)
-    sha = repo.create_commit('HEAD', comitter, comitter, message, tree.write(), [])
 
-    return HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
+    try:
+        sha = repo.create_commit('HEAD', comitter, comitter, message, tree.write(), [])
+        response = HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
+    except pygit2.GitError as e:
+        response = HttpResponseBadRequest("looks like you already have a project with this name!")
+
+    return response
 
 @require_http_methods(["POST"])
 @permissions.requires_permission_to('write')
@@ -80,12 +83,12 @@ def delete_project(request, user, project_name, permissions_token):
         HttpResponse: A message indicating the success or failure of the delete
     """
 
-    directory = porcelain.generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory, project_name)):
+    try:
+        directory = porcelain.generate_directory(user)
         path = os.path.join("./repos", directory, project_name)
         shutil.rmtree(path)
         response = HttpResponse("Deleted at ./repos/{}/{}".format(user, project_name))
-    else:
+    except FileNotFoundError as e:
         response = HttpResponseBadRequest("Not a repository.")
     response['Permissions'] = permissions_token
     return response
