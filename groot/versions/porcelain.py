@@ -52,7 +52,10 @@ def walk_tree(repo, full_path):
         locations = []
     blob = None
     for location in locations:
-        next_object = current_object.__getitem__(location)
+        try:
+            next_object = current_object.__getitem__(location)
+        except KeyError as e:
+            return None, None
         temp_object = current_object
         current_object = repo.get(next_object.id)
         if type(current_object) == pygit2.Blob:
