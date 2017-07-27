@@ -48,24 +48,21 @@ def create_project(request, user, project_name, permissions_token):
     """
 
     directory = porcelain.generate_directory(user)
+    path = os.path.join("./repos", directory, project_name)
+
     if not os.path.exists(os.path.join('./repos', directory)):
         os.makedirs(os.path.join('./repos', directory))
+    elif os.path.exists(path):
+        return httpresponsebadrequest("looks like you already have a project with this name!")
 
-    path = os.path.join("./repos", directory, project_name)
     repo = pygit2.init_repository(path, True)
-
+    tree = repo.TreeBuilder()
     message = "Initial Commit - Automated"
     comitter = pygit2.Signature('Wevolver', 'Wevolver')
-    parents = []
-
-    tree = repo.TreeBuilder()
     readme = "#{} \nThis is where you should document your project  \n### Getting Started".format(project_name)
     blob = repo.create_blob(readme)
     tree.insert('readme.md', blob, pygit2.GIT_FILEMODE_BLOB)
-
-    sha = repo.create_commit('HEAD',
-                             comitter, comitter, message,
-                             tree.write(), [])
+    sha = repo.create_commit('HEAD', comitter, comitter, message, tree.write(), [])
 
     return HttpResponse("Created at ./repos/{}/{}".format(user, project_name))
 
@@ -84,10 +81,12 @@ def delete_project(request, user, project_name, permissions_token):
     """
 
     directory = porcelain.generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory)):
+    if os.path.exists(os.path.join('./repos', directory, project_name)):
         path = os.path.join("./repos", directory, project_name)
         shutil.rmtree(path)
-    response = HttpResponse("Deleted at ./repos/{}/{}".format(user, project_name))
+        response = HttpResponse("Deleted at ./repos/{}/{}".format(user, project_name))
+    else:
+        response = HttpResponseBadRequest("Not a repository.")
     response['Permissions'] = permissions_token
     return response
 
@@ -105,10 +104,13 @@ def read_file(request, user, project_name, permissions_token):
     Returns:
         StreamingHttpResponse: The file's raw data.
     """
+    try:
+        path = request.GET.get('path').rstrip('/')
+    except:
+        return HttpResponseBadRequest("No path parameter.")
 
-    path = request.GET.get('path').rstrip('/')
     directory = porcelain.generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory)):
+    if os.path.exists(os.path.join('./repos', directory, project_name)):
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
         git_tree, git_blob = porcelain.walk_tree(repo, path)
         parsed_file = None
@@ -123,7 +125,9 @@ def read_file(request, user, project_name, permissions_token):
 
         # for download needs and argument in the call
         # response['Content-Disposition'] = "attachment; filename=%s" % path
-        return response
+    else:
+        response = HttpResponseBadRequest("Not a repository.")
+    return response
 
 @require_http_methods(["POST"])
 @permissions.requires_permission_to("write")
@@ -205,7 +209,7 @@ def list_bom(request, user, project_name, permissions_token):
     """
 
     directory = porcelain.generate_directory(user)
-    if os.path.exists(os.path.join('./repos', directory)):
+    if os.path.exists(os.path.join('./repos', directory, project_name)):
         repo = pygit2.Repository(os.path.join('./repos', directory, project_name))
         tree = (repo.revparse_single('master').tree)
         blobs = porcelain.flatten(tree, repo)
@@ -214,12 +218,12 @@ def list_bom(request, user, project_name, permissions_token):
             data += str(repo[b.id].data, 'utf-8')
         response = HttpResponse(data)
     else:
-        response = HttpResponse('Failed')
+        response = HttpResponseBadRequest('Not a repository')
     return response
 
 @require_http_methods(["GET"])
 @permissions.requires_permission_to('read')
-def download_archive(request, user, project_name):
+def download_archive(request, user, project_name, permissions_token):
     """ Grabs and returns a user's repository as a tarball.
 
     Args:
@@ -233,11 +237,14 @@ def download_archive(request, user, project_name):
     filename = project_name + '.tar'
     response = HttpResponse(content_type='application/x-gzip')
     response['Content-Disposition'] = 'attachment; filename=' + filename
-
     directory = porcelain.generate_directory(user)
-    with tarfile.open(fileobj=response, mode='w') as archive:
-        repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
-        repo.write_archive(repo.head.target, archive)
+
+    if os.path.exists(os.path.join('./repos', directory, project_name)):
+        with tarfile.open(fileobj=response, mode='w') as archive:
+            repo = pygit2.Repository(os.path.join("./repos", directory, project_name))
+            repo.write_archive(repo.head.target, archive)
+    else:
+        response = HttpResponseBadRequest("Not a repository")
     return response
 
 @require_http_methods(["GET"])
