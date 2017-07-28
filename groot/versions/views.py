@@ -223,8 +223,8 @@ def list_bom(request, user, project_name, permissions_token):
         for b in [blob for blob in blobs if blob.name == 'bom.csv']:
             data += str(repo[b.id].data, 'utf-8')
         response = HttpResponse(data)
-    except pygit2.giterror as e:
-        response = httpresponsebadrequest('not a repository')
+    except pygit2.GitError as e:
+        response = HttpResponseBadRequest('not a repository')
     return response
 
 @require_http_methods(["GET"])
