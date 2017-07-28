@@ -5,9 +5,9 @@ from django.http import StreamingHttpResponse
 from django.http import HttpResponseBadRequest
 from django.conf import settings
 
-from groot.permissions import decorators as permissions
-from groot.versions import porcelain
-from groot.versions.git import GitResponse
+from welder.permissions import decorators as permissions
+from welder.versions import porcelain
+from welder.versions.git import GitResponse
 
 from wsgiref.util import FileWrapper
 from io import BytesIO

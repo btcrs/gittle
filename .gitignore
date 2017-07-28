@@ -1,6 +1,6 @@
 repos/*
 db.sqlite3
-groot/secrets.json
+welder/secrets.json
 logs/*
 **/.DS_Store
 //*.pyc

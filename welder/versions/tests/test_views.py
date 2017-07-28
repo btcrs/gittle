@@ -1,6 +1,6 @@
 from pygit2 import Repository, GIT_FILEMODE_BLOB, GIT_FILEMODE_TREE, Signature, IndexEntry
 from django.test.utils import override_settings
-from groot.versions.porcelain import generate_directory
+from welder.versions.porcelain import generate_directory
 from django.conf import settings
 from django.test import TestCase
 from django.test import Client
