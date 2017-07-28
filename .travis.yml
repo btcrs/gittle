@@ -1,22 +1,22 @@
 sudo: required
 
 language: python
-
-services:
-      - docker
+python:
+   - "3.6"
 
 before_install:
-      - docker build -t btcrs/groot .
-      - pip install coverage
+      - git clone --depth 1 --single-branch https://github.com/libgit2/libgit2.git
+      - cd libgit2
+      - mkdir build && cd build
+      - sudo cmake ..
+      - sudo cmake --build .
+      - sudo cmake --build . --target install
+      - cd ${TRAVIS_BUILD_DIR}
+      - sudo apt-get install libpq-dev python-dev libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev libffi-dev build-essential libssl-dev build-essential autoconf libtool pkg-config
+      - pip install -r requirements.txt
 
 script:
-      # - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code btcrs/groot /bin/sh -c 'cd ./app && coverage run --source=./ manage.py test'
-      - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code btcrs/groot /bin/sh -c 'cd ./app && ls'
-
-after_success:
-      - test $TRAVIS_BRANCH = "master" && docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-      - test $TRAVIS_BRANCH = "master" && docker push btcrs/groot
-      - docker run --rm -it -p 8000:8000 -v `pwd`:/code -w /code -e COVERALLS_REPO_TOKEN=$COVERALLS btcrs/groot /bin/sh -c 'cd ./app && coveralls'
+      - python ./manage.py test
 
 notifications:
   slack: wevolver:xL4CGDEFEJ6qQeTHMFVk9tEe

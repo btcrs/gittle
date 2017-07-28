@@ -8,7 +8,7 @@ RUN cd libgit2-0.26.0 \
     && make \
     && make install
 
-RUN git clone https://github.com/btcrs/groot
+RUN git clone https://github.com/btcrs/welder
 COPY . /git_code
 
 RUN pip install sphinx
