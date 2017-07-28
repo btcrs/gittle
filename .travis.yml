@@ -2,20 +2,12 @@ sudo: required
 
 language: python
 
-services:
-      - docker
-
 before_install:
-      - docker build -t btcrs/groot .
       - sudo apt-get install libpq-dev python-dev libxml2-dev libxslt1-dev libldap2-dev libsasl2-dev libffi-dev build-essential libssl-dev build-essential autoconf libtool pkg-config
       - pip install -r requirements.txt
 
 script:
       - python manage.py run
-
-after_success:
-      - test $TRAVIS_BRANCH = "master" && docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-      - test $TRAVIS_BRANCH = "master" && docker push btcrs/groot
 
 notifications:
   slack: wevolver:xL4CGDEFEJ6qQeTHMFVk9tEe
