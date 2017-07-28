@@ -1,11 +1,11 @@
 # Welder 
 
-[![Coverage Status](https://coveralls.io/repos/github/btcrs/groot/badge.svg?branch=upload-testing)](https://coveralls.io/github/btcrs/groot?branch=master) [![Build Status](https://travis-ci.org/btcrs/groot.svg?branch=master)](https://travis-ci.org/btcrs/groot)
+[![Coverage Status](https://coveralls.io/repos/github/btcrs/groot/badge.svg?branch=upload-testing)](https://coveralls.io/github/btcrs/groot?branch=master) [![Build Status](https://travis-ci.org/btcrs/groot.svg?branch=master)](https://travis-ci.org/btcrs/groot) [![API Docs](https://img.shields.io/badge/API-Slate-ff69b4.svg)](https://btcrs.github.io/slate)
 
 ## Installation Requirements
 
 * [Python 3](http://python-guide-pt-br.readthedocs.io/en/latest/starting/installation/) - Requires python 3.6 or newer.
-* [Git](https://git-scm.com/downloads) - The latest version.
+* [Git](https://git-scm.com/downloads) - Latest version.
 * [libgit2](https://github.com/libgit2/libgit2) - Latest version. Libgit2 is a portable, pure C implementation of the Git core methods.
 
 
@@ -21,10 +21,21 @@ $ python manage.py runserver
 ```
 
 ## Examples
+In all examples api is the base url, user and project can be whatever you choose. Username and password are not enforced.
+
 Creating  repo:
 
-Cloning a repo:
+```
+ curl -X POST \
+  {{api}}/{{user}}/{{project}}/create \
+  -H "Content-Type: application/json"
+```
 
+Cloning a repo. In the command line:
+
+```
+ $ git clone {{project}}
+```
 
 <!--## Contributing
 
